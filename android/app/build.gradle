@@ -134,6 +134,27 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        ndk {
+            abiFilters "armeabi-v7a", "x86", "arm64-v8a","x86_64"
+            moduleName "helloworld"
+            ldLibs "log"
+        }
+    }
+
+     // Here we can add source code to our project
+     sourceSets {
+        main {
+            // first our new Java code
+            java.srcDirs = ["../../djinni/java", "src/main/java"]
+            // second our JNI classes
+            jni.srcDirs = ["../../djinni/jni"]
+        }
+    }
+    externalNativeBuild {
+        // This points ndk-build at our Android.mk file
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
     }
     splits {
         abi {
@@ -182,7 +203,6 @@ android {
                 output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
             }
-
         }
     }
 }

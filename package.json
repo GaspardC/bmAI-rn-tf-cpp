@@ -18,6 +18,7 @@
     "@babel/runtime": "^7.10.2",
     "@react-native-community/eslint-config": "^1.1.0",
     "babel-jest": "^26.0.1",
+    "djinni": "dropbox/djinni",
     "eslint": "^7.1.0",
     "jest": "^26.0.1",
     "metro-react-native-babel-preset": "^0.59.0",

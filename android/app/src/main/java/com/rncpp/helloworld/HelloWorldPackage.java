@@ -1,5 +1,5 @@
-// android/app/src/main/java/com/cppreactnative/helloworld/HelloWorldPackage.java
-package com.cppreactnative.helloworld;
+// android/app/src/main/java/com/rncpp/helloworld/HelloWorldPackage.java
+package com.rncpp.helloworld;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;

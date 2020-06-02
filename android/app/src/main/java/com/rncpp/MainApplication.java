@@ -1,6 +1,6 @@
 package com.rncpp;
 
-import com.cppreactnative.helloworld.HelloWorldPackage; // Add this import statement
+import com.rncpp.helloworld.HelloWorldPackage; // Add this import statement
 
 import android.app.Application;
 import android.content.Context;

@@ -1,0 +1,58 @@
+{
+  "variant": {
+    "module": {
+      "rootBuildGradleFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android",
+      "sdkFolder": "/Users/Gasp/Library/Android/sdk",
+      "isNativeCompilerSettingsCacheEnabled": false,
+      "isBuildOnlyTargetAbiEnabled": true,
+      "splitsAbiFilterSet": [],
+      "intermediatesFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates",
+      "gradleModulePathName": ":app",
+      "moduleRootFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app",
+      "makeFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Android.mk",
+      "buildSystem": "NDK_BUILD",
+      "compilerSettingsCacheFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/.cxx",
+      "cxxFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx",
+      "ndkFolder": "/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646",
+      "ndkVersion": "21.2.6472646",
+      "ndkSupportedAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "ndkDefaultAbiList": [
+        "ARMEABI_V7A",
+        "ARM64_V8A",
+        "X86",
+        "X86_64"
+      ],
+      "cmakeToolchainFile": "."
+    },
+    "buildSystemArgumentList": [],
+    "cFlagList": [],
+    "cppFlagsList": [],
+    "variantName": "release",
+    "soFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib",
+    "objFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local",
+    "jsonFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release",
+    "gradleBuildOutputFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cxx/release",
+    "isDebuggableEnabled": false,
+    "validAbiList": [
+      "ARMEABI_V7A",
+      "X86"
+    ],
+    "buildTargetSet": []
+  },
+  "abi": "ARMEABI_V7A",
+  "abiPlatformVersion": 16,
+  "cxxBuildFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a",
+  "jsonFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a/android_gradle_build.json",
+  "gradleBuildOutputFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cxx/release/armeabi-v7a",
+  "objFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a",
+  "buildCommandFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a/build_command.txt",
+  "buildOutputFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a/build_output.txt",
+  "modelOutputFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a/build_model.json",
+  "jsonGenerationLoggingRecordFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a/json_generation_record.json",
+  "compileCommandsJsonFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a/compile_commands.json"
+}
