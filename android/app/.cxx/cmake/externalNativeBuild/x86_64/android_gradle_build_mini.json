@@ -1,0 +1,19 @@
+{
+  "buildFiles": [
+    "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/cpp/CMakeLists.txt",
+    "/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/build/cmake/platforms.cmake",
+    "/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/build/cmake/android.toolchain.cmake"
+  ],
+  "cleanCommands": [
+    "/Users/Gasp/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cmake/externalNativeBuild/x86_64\" clean"
+  ],
+  "buildTargetsCommand": "/Users/Gasp/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cmake/externalNativeBuild/x86_64\" {LIST_OF_TARGETS_TO_BUILD}",
+  "libraries": {
+    "native-lib-Release-x86_64": {
+      "artifactName": "native-lib",
+      "buildCommand": "/Users/Gasp/Library/Android/sdk/cmake/3.10.2.4988404/bin/ninja -C \"/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cmake/externalNativeBuild/x86_64\" native-lib",
+      "abi": "x86_64",
+      "output": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/cmake/externalNativeBuild/obj/x86_64/libnative-lib.so"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+rm -f /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/*
+rm -f /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/gdbserver
+rm -f /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/gdb.setup
+mkdir -p /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/x86_64
+echo [x86_64] "Prebuilt       ": "libopencv_java4.so <= /Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk/native/jni/../libs/x86_64/"
+cp -f /Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk/native/jni/../libs/x86_64/libopencv_java4.so /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libopencv_java4.so
+echo [x86_64] "SharedLibrary  ": "libhelloworld.so"
+/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ -Wl,-soname,libhelloworld.so -shared -lgcc -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a -latomic -Wl,--exclude-libs,libatomic.a /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libopencv_java4.so -target x86_64-none-linux-android21 -no-canonical-prefixes    -Wl,--build-id  -Wl,--exclude-libs,libippicv.a -Wl,--exclude-libs,libippiw.a -nostdlib++ -Wl,--no-undefined -Wl,--fatal-warnings  -lc -lm -o /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libhelloworld.so
+mkdir -p /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64
+echo [x86_64] "Install        ": "libhelloworld.so => /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/libhelloworld.so"
+install -p /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libhelloworld.so /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/libhelloworld.so
+/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/darwin-x86_64/bin/x86_64-linux-android-strip --strip-unneeded  /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/libhelloworld.so
+echo [x86_64] "Install        ": "libopencv_java4.so => /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/libopencv_java4.so"
+install -p /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/x86_64/libopencv_java4.so /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/libopencv_java4.so
+/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/darwin-x86_64/bin/x86_64-linux-android-strip --strip-unneeded  /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib/x86_64/libopencv_java4.so

@@ -134,28 +134,35 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        ndk {
-            abiFilters "armeabi-v7a", "x86", "arm64-v8a","x86_64"
-            moduleName "helloworld"
-            ldLibs "log"
-        }
+         ndk {
+             abiFilters "armeabi-v7a", "x86", "arm64-v8a","x86_64"
+             moduleName "helloworld"
+             ldLibs "log"
+         }
+//        externalNativeBuild {
+//            cmake {
+//                cppFlags "-frtti -fexceptions"
+//                abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+//                arguments "-DOpenCV_DIR=" + opencvsdk + "/sdk/native"
+//            }
+//        }
     }
 
-     // Here we can add source code to our project
-     sourceSets {
-        main {
-            // first our new Java code
-            java.srcDirs = ["../../djinni/java", "src/main/java"]
-            // second our JNI classes
-            jni.srcDirs = ["../../djinni/jni"]
-        }
-    }
-    externalNativeBuild {
-        // This points ndk-build at our Android.mk file
-        ndkBuild {
-            path file('src/main/jni/Android.mk')
-        }
-    }
+      // Here we can add source code to our project
+      sourceSets {
+         main {
+             // first our new Java code
+             java.srcDirs = ["../../djinni/java", "src/main/java"]
+             // second our JNI classes
+             jni.srcDirs = ["../../djinni/jni"]
+         }
+     }
+     externalNativeBuild {
+         // This points ndk-build at our Android.mk file
+         ndkBuild {
+             path file('src/main/jni/Android.mk')
+         }
+     }
     splits {
         abi {
             reset()
@@ -183,6 +190,12 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
+//        externalNativeBuild {
+//            cmake {
+//                path "src/main/cpp/CMakeLists.txt"
+//                version "3.10.2"
+//            }
+//        }
     }
 
     packagingOptions {
@@ -211,6 +224,8 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
+
+//    implementation project(path: ':opencv')
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
@@ -241,5 +256,6 @@ task copyDownloadableDepsToLibs(type: Copy) {
     from configurations.compile
     into 'libs'
 }
+
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

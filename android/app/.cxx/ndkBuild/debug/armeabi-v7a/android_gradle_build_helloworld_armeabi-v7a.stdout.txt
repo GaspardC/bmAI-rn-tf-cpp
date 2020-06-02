@@ -1,1 +1,7 @@
-make: Nothing to be done for 'helloworld'.
+[armeabi-v7a] Compile++ thumb: helloworld <= NativeHelloWorld.cpp
+[armeabi-v7a] Compile++ thumb: helloworld <= hello_world_impl.cpp
+[armeabi-v7a] Compile++ thumb: helloworld <= djinni_main.cpp
+[armeabi-v7a] Compile++ thumb: helloworld <= djinni_support.cpp
+[armeabi-v7a] Prebuilt       : libopencv_java4.so <= /Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk/native/jni/../libs/armeabi-v7a/
+[armeabi-v7a] Prebuilt       : libc++_shared.so <= <NDK>/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/
+[armeabi-v7a] SharedLibrary  : libhelloworld.so

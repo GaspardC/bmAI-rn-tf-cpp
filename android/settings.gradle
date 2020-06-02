@@ -1,3 +1,6 @@
 rootProject.name = 'rncpp'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
+
+include ':opencv'
+project(':opencv').projectDir = new File('/Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk')

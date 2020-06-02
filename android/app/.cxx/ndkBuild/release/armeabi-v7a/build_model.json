@@ -40,12 +40,14 @@
     "isDebuggableEnabled": false,
     "validAbiList": [
       "ARMEABI_V7A",
-      "X86"
+      "ARM64_V8A",
+      "X86",
+      "X86_64"
     ],
     "buildTargetSet": []
   },
   "abi": "ARMEABI_V7A",
-  "abiPlatformVersion": 16,
+  "abiPlatformVersion": 21,
   "cxxBuildFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a",
   "jsonFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/armeabi-v7a/android_gradle_build.json",
   "gradleBuildOutputFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cxx/release/armeabi-v7a",

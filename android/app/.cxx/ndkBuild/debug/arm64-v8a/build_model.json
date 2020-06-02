@@ -47,7 +47,7 @@
     "buildTargetSet": []
   },
   "abi": "ARM64_V8A",
-  "abiPlatformVersion": 16,
+  "abiPlatformVersion": 21,
   "cxxBuildFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/debug/arm64-v8a",
   "jsonFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/debug/arm64-v8a/android_gradle_build.json",
   "gradleBuildOutputFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cxx/debug/arm64-v8a",

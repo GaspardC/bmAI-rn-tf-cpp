@@ -47,7 +47,7 @@
     "buildTargetSet": []
   },
   "abi": "ARMEABI_V7A",
-  "abiPlatformVersion": 16,
+  "abiPlatformVersion": 21,
   "cxxBuildFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/debug/armeabi-v7a",
   "jsonFile": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/debug/armeabi-v7a/android_gradle_build.json",
   "gradleBuildOutputFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cxx/debug/armeabi-v7a",

@@ -15,7 +15,10 @@ namespace helloworld
 
     std::string HelloWorldImpl::get_hello_world()
     {
-        std::string myString = "C++ says Hello World !";
+        std::string myString = "C++ says Hello World 6 !";
+        cv::Mat dark_channel;
+        // Mat output = Mat::zeros( 120, 350, CV_8UC3 );
+        // cout << "Output sentence"
         return myString;
     }
 } // namespace helloworld

@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cmake/release/armeabi-v7a",
+  "command": "/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ --target=armv7-none-linux-androideabi21 --gcc-toolchain=/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/darwin-x86_64 --sysroot=/Users/Gasp/Library/Android/sdk/ndk/21.2.6472646/toolchains/llvm/prebuilt/darwin-x86_64/sysroot  -Dnative_lib_EXPORTS -I/Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk/native/jni/include  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -frtti -fexceptions -Oz -DNDEBUG  -fPIC   -o CMakeFiles/native-lib.dir/native-lib.cpp.o -c /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/cpp/native-lib.cpp",
+  "file": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/cpp/native-lib.cpp"
+}
+]
