@@ -10,6 +10,7 @@
   _cppApi = [HWHelloWorld create];
   return self;
 }
+
 + (BOOL)requiresMainQueueSetup
 {
   return NO;
@@ -19,7 +20,7 @@ RCT_REMAP_METHOD(sayHello,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-  NSString *response = [_cppApi getHelloWorld];
+  NSString *response = [_cppApi analyzeImage:@"Hello World"];
   resolve(response);
 }
 @end
