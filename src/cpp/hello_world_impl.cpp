@@ -13,9 +13,9 @@ namespace helloworld
     {
     }
 
-    std::string HelloWorldImpl::get_hello_world()
+    std::string HelloWorldImpl::analyze_image(const std::string &photoUri)
     {
-        std::string myString = "C++ says Hello World 6 !";
+        std::string myString = "C++ says Hello World 6 ! " + photoUri;
         cv::Mat dark_channel;
         // Mat output = Mat::zeros( 120, 350, CV_8UC3 );
         // cout << "Output sentence"

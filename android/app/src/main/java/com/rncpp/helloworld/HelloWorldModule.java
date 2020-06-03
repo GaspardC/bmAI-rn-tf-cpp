@@ -27,7 +27,8 @@
      @ReactMethod
      public void sayHello(Promise promise) {
          // call the "getHelloWorld()" method on our C++ class and get the results.
-         String myString = cppApi.getHelloWorld();
+         String photoUri = "photoUri";
+         String myString = cppApi.analyzeImage(photoUri);
          promise.resolve(myString);
      }
  }

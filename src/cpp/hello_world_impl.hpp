@@ -15,7 +15,7 @@ namespace helloworld {
         HelloWorldImpl();
 
         // Our method that returns a string
-        std::string get_hello_world();
+        std::string analyze_image(const std::string &photoUri);
 
     };
 
