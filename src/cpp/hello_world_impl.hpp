@@ -5,18 +5,27 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 
-namespace helloworld {
+#include <iostream>
+#include <tuple>
+#include <math.h>
+#include <functional>
+#include <algorithm>
 
-    class HelloWorldImpl : public helloworld::HelloWorld {
+using namespace std;
+using namespace cv;
+
+namespace helloworld
+{
+
+    class HelloWorldImpl : public helloworld::HelloWorld
+    {
 
     public:
-
         // Constructor
         HelloWorldImpl();
 
         // Our method that returns a string
         std::string analyze_image(const std::string &photoUri);
-
     };
 
-}
+} // namespace helloworld

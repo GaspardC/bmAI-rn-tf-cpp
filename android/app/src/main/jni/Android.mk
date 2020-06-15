@@ -13,7 +13,7 @@ LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 NDK_DEBUG=1
 
 # Specify C++ flags
-LOCAL_CPPFLAGS := -std=c++14
+LOCAL_CPPFLAGS := -std=c++17
 LOCAL_CPPFLAGS += -fexceptions
 LOCAL_CPPFLAGS += -frtti
 LOCAL_CPPFLAGS += -Wall
@@ -42,7 +42,7 @@ include ${OPENCVROOT}/sdk/native/jni/OpenCV.mk
 LOCAL_MODULE := helloworld
 
 # Specify C++ flags
-LOCAL_CPPFLAGS := -std=c++14
+LOCAL_CPPFLAGS := -std=c++17
 LOCAL_CPPFLAGS += -fexceptions
 LOCAL_CPPFLAGS += -frtti
 LOCAL_CPPFLAGS += -Wall

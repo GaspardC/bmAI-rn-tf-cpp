@@ -9,27 +9,19 @@
   },
   {
     "level": "INFO",
-    "message": "- force flag, will remove stale json folder"
+    "message": "- a dependent build file changed"
   },
   {
     "level": "INFO",
-    "message": "- expected json /Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/x86_64/android_gradle_build.json file is not present, will remove stale json folder"
+    "message": "  - /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Android.mk"
   },
   {
     "level": "INFO",
-    "message": "- missing previous command file /Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/x86_64/build_command.txt, will remove stale json folder"
+    "message": "  - /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Application.mk"
   },
   {
     "level": "INFO",
-    "message": "- command changed from previous, will remove stale json folder"
-  },
-  {
-    "level": "INFO",
-    "message": "removing stale contents from \u0027/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/x86_64\u0027"
-  },
-  {
-    "level": "INFO",
-    "message": "created folder \u0027/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/x86_64\u0027"
+    "message": "keeping json folder \u0027/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/ndkBuild/release/x86_64\u0027 but regenerating project"
   },
   {
     "level": "INFO",
