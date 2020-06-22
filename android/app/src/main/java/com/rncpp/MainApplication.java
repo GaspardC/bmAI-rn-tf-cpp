@@ -2,6 +2,9 @@ package com.rncpp;
 
 import com.rncpp.helloworld.HelloWorldPackage; // Add this import statement
 
+import com.rncpp.generated.BasePackageList;
+
+
 import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
@@ -12,11 +15,15 @@ import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Arrays;
 
 import org.unimodules.adapters.react.ModuleRegistryAdapter;
 import org.unimodules.adapters.react.ReactAdapterPackage;
 import org.unimodules.adapters.react.ReactModuleRegistryProvider;
 import org.unimodules.core.interfaces.Package;
+
+import org.unimodules.core.interfaces.SingletonModule;
+
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -33,6 +40,13 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           packages.add(new HelloWorldPackage());
+
+          // Add unimodules
+          List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
+            new ModuleRegistryAdapter(mModuleRegistryProvider)
+          );
+          packages.addAll(unimodules);
+
           return packages;
         }
 
@@ -54,12 +68,15 @@ public class MainApplication extends Application implements ReactApplication {
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
 
-  private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(Arrays.<Package>asList(
-    new ReactAdapterPackage()
-    // more packages, like
-    // new CameraPackage(), if you use expo-camera
-    // etc.
-), /* singletonModules */ null);
+//   private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(Arrays.<Package>asList(
+//     new ReactAdapterPackage(),
+//     new BasePackageList().getPackageList()
+//     // more packages, like
+//     // new CameraPackage(), if you use expo-camera
+//     // etc.
+// ), /* singletonModules */ null);
+
+private final ReactModuleRegistryProvider mModuleRegistryProvider = new ReactModuleRegistryProvider(new BasePackageList().getPackageList(), null);
 
   /**
    * Loads Flipper in React Native templates. Call this in the onCreate method with something like
