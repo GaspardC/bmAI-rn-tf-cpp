@@ -13,7 +13,4 @@
 /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:272:42: warning: unused parameter 'mask_high' [-Wunused-parameter]
                                 cv::Mat &mask_high)
                                          ^
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:348:14: warning: unused variable 'value' [-Wunused-variable]
-        auto value = REF_TENNIS_BALL / (2 * radius);
-             ^
-6 warnings generated.
+5 warnings generated.

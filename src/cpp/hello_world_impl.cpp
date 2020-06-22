@@ -274,22 +274,42 @@ namespace helloworld
 
         // add circle
         cv::circle(image_high, cv::Point(x_mean + minCol, y_mean + minRow), int(r), cv::Scalar(0, 0, 255), 20);
+        return image_high;
         // imshow("image_high", image_high);
         // cv::waitKey();
     }
 
-    int main(const std::string &uri)
+    std::string trim_uri_protocal(const std::string &uri)
     {
-        std::cout << "Starting the tennis ball detection" << std::endl;
+        return uri.find_first_of("file://") == std::string::npos ? uri : uri.substr(7);
+    }
 
+    string get_result_uri(const std::string &uri)
+    {
+        std::size_t delimiter = uri.find_last_of(".");
+        return uri.substr(0, delimiter) + "_result" + uri.substr(delimiter);
+    }
+
+    std::string save_result_image(const cv::Mat &result_image, const std::string &uri)
+    {
+        // std::vector<int32_t> compression_params = {CV_IMWRITE_PNG_COMPRESSION, 9};
+        std::string result_uri = get_result_uri(uri);
+        cv::imwrite(trim_uri_protocal(result_uri), result_image);
+        return result_uri;
+    }
+
+    string launch_detection(const std::string &uri)
+    {
+        // std::cout << "Starting the tennis ball detection" << std::endl;
         cv::Mat res;
         cv::Mat edges;
 
         // cv::namedWindow("edges", 1);
         cv::Mat frame;
         //    frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball_horiz.JPG");
-        frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball.JPG");
-
+        // frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball.JPG");
+        // frame = cv::imread(trim_uri_protocal(uri));
+        frame = cv::imread(uri);
         //  Step 1 resize image to a lower resolution
         auto [image, fx] = resize(frame, 600);
 
@@ -332,7 +352,7 @@ namespace helloworld
         cv::Mat edge;
         cv::Canny(imgHigh, edge, 200, 255);
 
-        //    x_mean, y_mean, a, b
+        // x_mean, y_mean, a, b
         auto ellipse_values = get_fitting_ellipse(edge);
         auto x_mean = ellipse_values[0];
         auto y_mean = ellipse_values[1];
@@ -340,15 +360,16 @@ namespace helloworld
         auto b = ellipse_values[3];
 
         auto radius = sqrt((float)a * b);
-        draw_detection_details(frame, x_mean, y_mean, radius, bbox_re[0], bbox_re[1], mask_high);
+        auto imgRes = draw_detection_details(frame, x_mean, y_mean, radius, bbox_re[0], bbox_re[1], mask_high);
+        save_result_image(imgRes, uri);
 
         auto REF_TENNIS_BALL = 6.7 / 2;
 
         // values to return
         auto value = REF_TENNIS_BALL / (2 * radius);
         vector<double> vect{x_mean, y_mean, a, b};
-
-        return 0;
+        auto resStr = "{\"value\":" + to_string(value) + R"(", "x_mean":)" + to_string(x_mean) + R"(", "y_mean":)" + to_string(y_mean) + R"(", "a":)" + to_string(a) + R"(", "b":)" + to_string(b) + "\"}";
+        return resStr;
     }
 
     std::shared_ptr<HelloWorld> HelloWorld::create()
@@ -366,6 +387,7 @@ namespace helloworld
         cv::Mat dark_channel;
         // Mat output = Mat::zeros( 120, 350, CV_8UC3 );
         // cout << "Output sentence"
-        return myString;
+        return launch_detection(photoUri);
+        // return photoUri;
     }
 } // namespace helloworld

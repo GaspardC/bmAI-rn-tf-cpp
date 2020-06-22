@@ -4,3 +4,6 @@ include ':app'
 
 include ':opencv'
 project(':opencv').projectDir = new File('/Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk')
+
+include ':unimodules-react-native-adapter'
+project(':unimodules-react-native-adapter').projectDir = new File(rootProject.projectDir, '../node_modules/@unimodules/react-native-adapter/android')

@@ -12,8 +12,11 @@
     "djini:ios": "./run_djinni.sh && yarn ios"
   },
   "dependencies": {
+    "pod-install": "^0.1.7",
     "react": "16.11.0",
-    "react-native": "0.62.2"
+    "react-native": "0.62.2",
+    "react-native-image-picker": "^2.3.1",
+    "react-native-unimodules": "^0.9.1"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

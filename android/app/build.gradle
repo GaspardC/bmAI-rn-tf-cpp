@@ -227,6 +227,8 @@ dependencies {
 
 //    implementation project(path: ':opencv')
 
+    compile project(':unimodules-react-native-adapter')
+
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {

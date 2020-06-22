@@ -13,11 +13,19 @@ import {
   ScrollView,
   View,
   Text,
+  TouchableOpacity,
   StatusBar,
   NativeModules,
 } from 'react-native';
+import ImagePicker from 'react-native-image-picker';
 
 import {Header, Colors} from 'react-native/Libraries/NewAppScreen';
+import {
+  Asset,
+  Constants,
+  FileSystem,
+  Permissions,
+} from 'react-native-unimodules';
 
 const {HelloWorld} = NativeModules;
 
@@ -25,8 +33,32 @@ const App = () => {
   const [hello, setHello] = useState('bye');
 
   useEffect(() => {
-    HelloWorld.sayHello().then((res) => setHello(res));
+    // HelloWorld.sayHello().then((res) => setHello(res));
+    // console.log(Permissions);
   }, []);
+
+  const openPicker = () => {
+    const options = {noData: true};
+    ImagePicker.showImagePicker(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+      } else {
+        const source = {uri: response.uri};
+
+        // You can also display the image using data:
+        // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+        // setHello(response.uri);
+        HelloWorld.sayHello(response.uri).then((res) => setHello(res));
+      }
+    });
+  };
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -39,6 +71,10 @@ const App = () => {
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Step One : {hello}</Text>
             </View>
+
+            <TouchableOpacity onPress={() => openPicker()}>
+              <Text>Take Photo</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
