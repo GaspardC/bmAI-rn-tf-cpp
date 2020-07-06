@@ -308,8 +308,8 @@ namespace helloworld
         cv::Mat frame;
         //    frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball_horiz.JPG");
         // frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball.JPG");
-        // frame = cv::imread(trim_uri_protocal(uri));
-        frame = cv::imread(uri);
+        frame = cv::imread(trim_uri_protocal(uri));
+        // frame = cv::imread(uri);
         //  Step 1 resize image to a lower resolution
         auto [image, fx] = resize(frame, 600);
 
@@ -361,14 +361,14 @@ namespace helloworld
 
         auto radius = sqrt((float)a * b);
         auto imgRes = draw_detection_details(frame, x_mean, y_mean, radius, bbox_re[0], bbox_re[1], mask_high);
-        save_result_image(imgRes, uri);
+        auto resUri = save_result_image(imgRes, uri);
 
         auto REF_TENNIS_BALL = 6.7 / 2;
 
         // values to return
         auto value = REF_TENNIS_BALL / (2 * radius);
         vector<double> vect{x_mean, y_mean, a, b};
-        auto resStr = "{\"value\":" + to_string(value) + R"(", "x_mean":)" + to_string(x_mean) + R"(", "y_mean":)" + to_string(y_mean) + R"(", "a":)" + to_string(a) + R"(", "b":)" + to_string(b) + "\"}";
+        auto resStr = "{\"value\":\"" + to_string(value) + R"(", "x_mean":")" + to_string(x_mean) + R"(", "y_mean":")" + to_string(y_mean) + R"(", "a":")" + to_string(a) + R"(", "b":")" + to_string(b) + R"(", "resUri":")" + resUri + "\"}";
         return resStr;
     }
 

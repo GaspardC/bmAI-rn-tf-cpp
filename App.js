@@ -8,6 +8,7 @@
 
 import React, {useEffect, useState} from 'react';
 import {
+  Image,
   SafeAreaView,
   StyleSheet,
   ScrollView,
@@ -27,15 +28,46 @@ import {
   Permissions,
 } from 'react-native-unimodules';
 
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
+import {
+  fetch,
+  decodeJpeg,
+  bundleResourceIO,
+} from '@tensorflow/tfjs-react-native';
+import {resizeImage, base64ImageToTensor} from './src/utils';
+
 const {HelloWorld} = NativeModules;
 
 const App = () => {
-  const [hello, setHello] = useState('bye');
+  const [resTennisBall, setResTennisBall] = useState('');
+  const [imgPicked, setImagePicked] = useState('');
+
+  const [isTfReady, setTfReady] = useState(false);
+  const [imageRes, setImageRes] = useState(null);
+  const [imageUri, setImageUri] = useState('');
 
   useEffect(() => {
-    // HelloWorld.sayHello().then((res) => setHello(res));
     // console.log(Permissions);
   }, []);
+
+  const processCppImg = (uri) => {
+    HelloWorld.sayHello(uri)
+      .then((res) => {
+        console.log('res', res);
+        setResTennisBall(JSON.parse(res));
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
+
+  const processImg = (uri) => {
+    async function waitForTensorFlowJs() {
+      await tf.ready();
+      setTfReady(true);
+    }
+  };
 
   const openPicker = () => {
     const options = {noData: true};
@@ -54,8 +86,16 @@ const App = () => {
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
 
-        // setHello(response.uri);
-        HelloWorld.sayHello(response.uri).then((res) => setHello(res));
+        setImagePicked(response.uri);
+        processCppImg(response.uri);
+        // HelloWorld.sayHello(response.uri).then((res) => setHello(res));
+
+        // async function waitForTensorFlowJs() {
+        //   await tf.ready();
+        //   setTfReady(true);
+        // }
+        setImageUri(response.uri);
+        // waitForTensorFlowJs().then(() => processImg(response.uri));
       }
     });
   };
@@ -69,12 +109,21 @@ const App = () => {
           <Header />
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One : {hello}</Text>
+              <Text style={styles.sectionTitle}>Step One</Text>
             </View>
-
             <TouchableOpacity onPress={() => openPicker()}>
               <Text>Take Photo</Text>
             </TouchableOpacity>
+            {imgPicked != null && (
+              <Image source={{uri: imgPicked, width: 200, height: 200}} />
+            )}
+            {resTennisBall?.resUri != null && (
+              <Image
+                resizeMode="contain"
+                style={{marginTop: 10}}
+                source={{uri: resTennisBall.resUri, width: 200, height: 200}}
+              />
+            )}
           </View>
         </ScrollView>
       </SafeAreaView>

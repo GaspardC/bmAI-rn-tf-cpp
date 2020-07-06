@@ -17,10 +17,14 @@
 }
 RCT_EXPORT_MODULE();
 RCT_REMAP_METHOD(sayHello,
+                 uri:(NSString *)uri
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-  NSString *response = [_cppApi analyzeImage:@"Hello World"];
-  resolve(response);
-}
+  NSString *response = [_cppApi analyzeImage:uri];
+  if (response) {
+        resolve(response);
+    } else {
+        reject(@"get_error", @"Error with Dehaze", nil);
+    }}
 @end
