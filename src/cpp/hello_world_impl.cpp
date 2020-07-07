@@ -1,5 +1,7 @@
 #include "hello_world_impl.hpp"
 #include <string>
+using namespace cv;
+
 namespace helloworld
 {
 
@@ -294,22 +296,38 @@ namespace helloworld
     {
         // std::vector<int32_t> compression_params = {CV_IMWRITE_PNG_COMPRESSION, 9};
         std::string result_uri = get_result_uri(uri);
-        cv::imwrite(trim_uri_protocal(result_uri), result_image);
+        //TODO add for ios
+
+        // imwrite(trim_uri_protocal(result_uri), result_image);
+        // HighGui.imwrite(trim_uri_protocal(result_uri), result_image);
         return result_uri;
     }
 
     string launch_detection(const std::string &uri)
     {
-        // std::cout << "Starting the tennis ball detection" << std::endl;
+        //  std::cout << "Starting the tennis ball detection" << std::endl;
         cv::Mat res;
         cv::Mat edges;
 
         // cv::namedWindow("edges", 1);
         cv::Mat frame;
         //    frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball_horiz.JPG");
-        // frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball.JPG");
-        frame = cv::imread(trim_uri_protocal(uri));
-        // frame = cv::imread(uri);
+        //        frame = cv::imread("/storage/1115-2412/Android/data/com.rncpp/files/ball2.jpg", cv::IMREAD_COLOR);
+
+        // cv::String inputStr;
+        // inputStr = "/data/user/0/com.rncpp/files/ball2.jpg";
+        // inputStr = "/data/data/com.rncpp/files/ball2.jpg";
+        // frame = cv::imread(inputStr, cv::IMREAD_COLOR);
+        // return (uri);
+        // frame = cv::imread(trim_uri_protocal(uri), cv::IMREAD_COLOR);
+        frame = cv::imread(uri);
+
+        if (frame.empty())
+        {
+            // fail, bail out !
+            // return "\"{\"error\":\"cannot read image : empty!\"}";
+            return "cannot read image : empty!";
+        }
         //  Step 1 resize image to a lower resolution
         auto [image, fx] = resize(frame, 600);
 

@@ -2,6 +2,7 @@
 import * as tf from '@tensorflow/tfjs';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as jpeg from 'jpeg-js';
+import { Platform } from 'react-native';
 
 export function toDataUri(base64: string): string {
     return `data:image/jpeg;base64,${base64}`;
@@ -69,3 +70,6 @@ export async function tensorToImageUrl(imageTensor: tf.Tensor4D):
     const base64Encoding = tf.util.decodeString(jpegImageData.data, 'base64');
     return base64Encoding;
 }
+
+
+export const isIos = () => Platform.OS === 'ios'

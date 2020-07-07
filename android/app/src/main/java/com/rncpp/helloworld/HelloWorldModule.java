@@ -28,8 +28,16 @@
      public void sayHello(String photoUri, Promise promise) {
          // call the "getHelloWorld()" method on our C++ class and get the results.
 //         String photoUri = "photoUri";
-         String myString = cppApi.analyzeImage(photoUri);
-         promise.resolve(myString);
+         try {
+             String response = cppApi.analyzeImage(photoUri);
+             if (!response.isEmpty()) {
+                 promise.resolve(response);
+             } else {
+                 throw new Exception("Error with tennis ball detect");
+             }
+         } catch (Exception e) {
+             promise.reject(e);
+         }
      }
  }
 
