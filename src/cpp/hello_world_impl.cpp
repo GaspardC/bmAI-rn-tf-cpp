@@ -319,8 +319,8 @@ namespace helloworld
         // inputStr = "/data/data/com.rncpp/files/ball2.jpg";
         // frame = cv::imread(inputStr, cv::IMREAD_COLOR);
         // return (uri);
-        // frame = cv::imread(trim_uri_protocal(uri), cv::IMREAD_COLOR);
-        frame = cv::imread(uri);
+         frame = cv::imread(trim_uri_protocal(uri), cv::IMREAD_COLOR);
+//        frame = cv::imread(uri);
 
         if (frame.empty())
         {

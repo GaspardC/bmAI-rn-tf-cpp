@@ -1,11 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React, { useEffect, useState } from 'react';
 import {
   Image,
@@ -25,26 +17,23 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 import '@tensorflow/tfjs-react-native';
 
-import { isIos } from './src/utils/index';
-import { downloadAssetSource } from './src/utils/uriHelper';
-const imgTest = require('./src/assets/images/ball2.jpg');
+import { isIos } from './utils/index';
+import { downloadAssetSource } from './utils/uriHelper';
+const imgTest = require('./assets/images/ball2.jpg');
 
 const { HelloWorld } = NativeModules;
 
 const App = () => {
-  const [resTennisBallOnTest, setResTennisBallOnTest] = useState('');
-  const [imgPicked, setImagePicked] = useState('');
+  const [resTennisBallOnTest, setResTennisBallOnTest] = useState<any>('');
+  const [imageDisplayed, setImageDisplayed] = useState<any>('')
 
-  const [isTfReady, setTfReady] = useState(false);
-  const [imageRes, setImageRes] = useState(null);
-  const [imageUri, setImageUri] = useState('');
 
   useEffect(() => {
     // console.log(Permissions);
-    requestReadWiteAndroidPermission();
+    if (!isIos) requestReadWiteAndroidPermission();
   }, []);
 
-  const processCppImg = ({ uriBoth, uri }) => {
+  const processCppImg = (uriBoth) => {
     HelloWorld.sayHello(uriBoth)
       .then(async (res) => {
         console.log('res', res);
@@ -53,6 +42,7 @@ const App = () => {
       })
       .catch((e) => {
         console.log(e);
+        setResTennisBallOnTest({ error: "a problem occured during the detection" });
       });
   };
 
@@ -96,11 +86,23 @@ const App = () => {
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         console.log(source);
-        setImagePicked(source.uri);
-        processCppImg(source);
+        setImageDisplayed({ uri: source.uri });
+        processCppImg(source.uriBoth);
       }
     });
   };
+
+  const runOnTheTestPhoto = async () => {
+    const img = Image.resolveAssetSource(imgTest);
+    const uriBoth = img.uri;
+    console.log('img', img);
+    let sourceFile = await downloadAssetSource(uriBoth);
+    sourceFile = `file://${sourceFile}`
+    console.log('sourceFile', sourceFile);
+    setResTennisBallOnTest('')
+    processCppImg(sourceFile);
+  }
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -114,24 +116,17 @@ const App = () => {
             </View>
             <TouchableOpacity
               style={styles.button}
-              onPress={async () => {
-                const img = Image.resolveAssetSource(imgTest);
-                const uriBoth = img.uri;
-                console.log('img', img);
-
-                const sourceFile = await downloadAssetSource(uriBoth);
-                console.log('sourceFile', sourceFile);
-                setImagePicked(uriBoth);
-                setResTennisBallOnTest('')
-                processCppImg({
-                  uriBoth: sourceFile,
-                });
-              }}>
+              onPress={runOnTheTestPhoto}>
               <Text>Run on the test photo</Text>
             </TouchableOpacity>
-            <Image source={imgTest} style={styles.imageTest} />
+            <Image source={imageDisplayed !== '' ? imageDisplayed : imgTest} style={styles.imageTest} />
             {resTennisBallOnTest !== '' && <Text>{`Tennis ball detected :
             ${JSON.stringify(resTennisBallOnTest, null, 2)}`}</Text>}
+            <TouchableOpacity
+              style={styles.button}
+              onPress={openPicker}>
+              <Text>Run on another photo</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </SafeAreaView>
