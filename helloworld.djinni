@@ -1,4 +1,4 @@
 hello_world = interface +c {
   static create(): hello_world;
-  analyze_image(photoUri: string): string;
+  analyze_image(photoUri: string, isIos: bool): string;
 }

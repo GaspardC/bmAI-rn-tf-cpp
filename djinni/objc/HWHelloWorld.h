@@ -9,6 +9,7 @@
 
 + (nullable HWHelloWorld *)create;
 
-- (nonnull NSString *)analyzeImage:(nonnull NSString *)photoUri;
+- (nonnull NSString *)analyzeImage:(nonnull NSString *)photoUri
+                             isIos:(BOOL)isIos;
 
 @end

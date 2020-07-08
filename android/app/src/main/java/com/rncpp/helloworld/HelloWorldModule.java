@@ -29,7 +29,7 @@
          // call the "getHelloWorld()" method on our C++ class and get the results.
 //         String photoUri = "photoUri";
          try {
-             String response = cppApi.analyzeImage(photoUri);
+             String response = cppApi.analyzeImage(photoUri, false);
              if (!response.isEmpty()) {
                  promise.resolve(response);
              } else {

@@ -28,12 +28,13 @@ CJNIEXPORT jobject JNICALL Java_com_rncpp_helloworld_HelloWorld_00024CppProxy_cr
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jstring JNICALL Java_com_rncpp_helloworld_HelloWorld_00024CppProxy_native_1analyzeImage(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jstring j_photoUri)
+CJNIEXPORT jstring JNICALL Java_com_rncpp_helloworld_HelloWorld_00024CppProxy_native_1analyzeImage(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jstring j_photoUri, jboolean j_isIos)
 {
     try {
         DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::helloworld::HelloWorld>(nativeRef);
-        auto r = ref->analyze_image(::djinni::String::toCpp(jniEnv, j_photoUri));
+        auto r = ref->analyze_image(::djinni::String::toCpp(jniEnv, j_photoUri),
+                                    ::djinni::Bool::toCpp(jniEnv, j_isIos));
         return ::djinni::release(::djinni::String::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }

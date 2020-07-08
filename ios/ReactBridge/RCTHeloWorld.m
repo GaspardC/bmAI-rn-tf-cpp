@@ -21,7 +21,7 @@ RCT_REMAP_METHOD(sayHello,
                  resolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject)
 {
-  NSString *response = [_cppApi analyzeImage:uri];
+  NSString *response = [_cppApi analyzeImage:uri isIos:YES];
   if (response) {
         resolve(response);
     } else {

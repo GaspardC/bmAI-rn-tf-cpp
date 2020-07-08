@@ -292,18 +292,19 @@ namespace helloworld
         return uri.substr(0, delimiter) + "_result" + uri.substr(delimiter);
     }
 
-    std::string save_result_image(const cv::Mat &result_image, const std::string &uri)
+    std::string save_result_image(const cv::Mat &result_image, const std::string &uri, const bool isIos)
     {
         // std::vector<int32_t> compression_params = {CV_IMWRITE_PNG_COMPRESSION, 9};
         std::string result_uri = get_result_uri(uri);
         //TODO add for ios
 
-        // imwrite(trim_uri_protocal(result_uri), result_image);
-        // HighGui.imwrite(trim_uri_protocal(result_uri), result_image);
+        if (isIos)
+            imwrite(trim_uri_protocal(result_uri), result_image);
+        // cv::imwrite(trim_uri_protocal(result_uri), result_image);
         return result_uri;
     }
 
-    string launch_detection(const std::string &uri)
+    string launch_detection(const std::string &uri, const bool isIos)
     {
         //  std::cout << "Starting the tennis ball detection" << std::endl;
         cv::Mat res;
@@ -319,8 +320,8 @@ namespace helloworld
         // inputStr = "/data/data/com.rncpp/files/ball2.jpg";
         // frame = cv::imread(inputStr, cv::IMREAD_COLOR);
         // return (uri);
-         frame = cv::imread(trim_uri_protocal(uri), cv::IMREAD_COLOR);
-//        frame = cv::imread(uri);
+        frame = cv::imread(trim_uri_protocal(uri), cv::IMREAD_COLOR);
+        //        frame = cv::imread(uri);
 
         if (frame.empty())
         {
@@ -379,7 +380,7 @@ namespace helloworld
 
         auto radius = sqrt((float)a * b);
         auto imgRes = draw_detection_details(frame, x_mean, y_mean, radius, bbox_re[0], bbox_re[1], mask_high);
-        auto resUri = save_result_image(imgRes, uri);
+        auto resUri = save_result_image(imgRes, uri, isIos);
 
         auto REF_TENNIS_BALL = 6.7 / 2;
 
@@ -399,13 +400,13 @@ namespace helloworld
     {
     }
 
-    std::string HelloWorldImpl::analyze_image(const std::string &photoUri)
+    std::string HelloWorldImpl::analyze_image(const std::string &photoUri, const bool isIos)
     {
-        std::string myString = "C++ says Hello World 6 ! " + photoUri;
-        cv::Mat dark_channel;
+        // std::string myString = "C++ says Hello World 6 ! " + photoUri;
+        // cv::Mat dark_channel;
         // Mat output = Mat::zeros( 120, 350, CV_8UC3 );
         // cout << "Output sentence"
-        return launch_detection(photoUri);
+        return launch_detection(photoUri, isIos);
         // return photoUri;
     }
 } // namespace helloworld

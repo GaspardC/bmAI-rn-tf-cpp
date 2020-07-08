@@ -6,7 +6,7 @@ package com.rncpp.helloworld;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class HelloWorld {
-    public abstract String analyzeImage(String photoUri);
+    public abstract String analyzeImage(String photoUri, boolean isIos);
 
     public static HelloWorld create()
     {
@@ -37,12 +37,12 @@ public abstract class HelloWorld {
         }
 
         @Override
-        public String analyzeImage(String photoUri)
+        public String analyzeImage(String photoUri, boolean isIos)
         {
             assert !this.destroyed.get() : "trying to use a destroyed object";
-            return native_analyzeImage(this.nativeRef, photoUri);
+            return native_analyzeImage(this.nativeRef, photoUri, isIos);
         }
-        private native String native_analyzeImage(long _nativeRef, String photoUri);
+        private native String native_analyzeImage(long _nativeRef, String photoUri, boolean isIos);
 
         public static native HelloWorld create();
     }

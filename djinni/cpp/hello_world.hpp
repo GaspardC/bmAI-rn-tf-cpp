@@ -14,7 +14,7 @@ public:
 
     static std::shared_ptr<HelloWorld> create();
 
-    virtual std::string analyze_image(const std::string & photoUri) = 0;
+    virtual std::string analyze_image(const std::string & photoUri, bool isIos) = 0;
 };
 
 }  // namespace helloworld

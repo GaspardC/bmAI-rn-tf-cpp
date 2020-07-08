@@ -27,7 +27,7 @@ namespace helloworld
         HelloWorldImpl();
 
         // Our method that returns a string
-        std::string analyze_image(const std::string &photoUri);
+        std::string analyze_image(const std::string &photoUri, const bool isIos);
     };
 
 } // namespace helloworld

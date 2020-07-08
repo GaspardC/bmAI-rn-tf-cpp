@@ -70,7 +70,6 @@ const App = () => {
     const options = { noData: true };
     ImagePicker.showImagePicker(options, (response) => {
       console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -87,6 +86,7 @@ const App = () => {
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         console.log(source);
         setImageDisplayed({ uri: source.uri });
+        setResTennisBallOnTest('')
         processCppImg(source.uriBoth);
       }
     });
@@ -99,6 +99,7 @@ const App = () => {
     let sourceFile = await downloadAssetSource(uriBoth);
     sourceFile = `file://${sourceFile}`
     console.log('sourceFile', sourceFile);
+    setImageDisplayed('');
     setResTennisBallOnTest('')
     processCppImg(sourceFile);
   }
@@ -119,9 +120,12 @@ const App = () => {
               onPress={runOnTheTestPhoto}>
               <Text>Run on the test photo</Text>
             </TouchableOpacity>
-            <Image source={imageDisplayed !== '' ? imageDisplayed : imgTest} style={styles.imageTest} />
+            <Image resizeMode="contain" source={imageDisplayed !== '' ? imageDisplayed : imgTest} style={styles.imageTest} />
             {resTennisBallOnTest !== '' && <Text>{`Tennis ball detected :
-            ${JSON.stringify(resTennisBallOnTest, null, 2)}`}</Text>}
+            ${JSON.stringify(resTennisBallOnTest, null, 2)}`}
+            </Text>}
+            {resTennisBallOnTest !== '' && isIos() && <Image resizeMode="contain" source={{ uri: resTennisBallOnTest.resUri, width: 200, height: 200 }} style={styles.imageTest} />
+            }
             <TouchableOpacity
               style={styles.button}
               onPress={openPicker}>

@@ -5,6 +5,28 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+# Path to the djinni support code
+set(support_dir src/djinni/support-lib/jni)
+# Path to the generated code and our own c++ implementations
+set(include_dirs djinni/cpp/ djinni/jni/ src/cpp/)
+
+# Djinni support code that needs to be compiled
+file(
+  GLOB_RECURSE support_srcs
+  ${support_dir}/*.cpp)
+# Generated code and c++ implementations that need to be compiled
+file(
+  GLOB_RECURSE lib_srcs
+  src/djinni/generated/cpp/*.cpp
+  src/djinni/generated/jni/*.cpp
+  src/main/cpp/*.cpp)
+
+# All the implementation files that make up our library
+set(complete_srcs ${support_srcs} ${lib_srcs})
+
+# Define library referring to the sources above
+add_library(native-lib SHARED ${complete_srcs})
+
 include_directories(${OpenCV_DIR}/jni/include)
 add_library( lib_opencv SHARED IMPORTED )
 set_target_properties(lib_opencv PROPERTIES IMPORTED_LOCATION ${OpenCV_DIR}/libs/${ANDROID_ABI}/libopencv_java4.so)
@@ -15,24 +37,19 @@ set_target_properties(lib_opencv PROPERTIES IMPORTED_LOCATION ${OpenCV_DIR}/libs
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-         native-lib
+        # native-lib
+        ${include_dirs}
+        ${support_dir}
 
         # Sets the library as a shared library.
         SHARED
 
         # Provides a relative path to your source file(s).
-         native-lib.cpp
+        #native-lib.cpp
+
         )
 
 
-#add_library( cv_core-lib SHARED IMPORTED)
-#set_target_properties(cv_core-lib PROPERTIES IMPORTED_LOCATION ${OpenCV_DIR}/libs/${ANDROID_ABI}/libopencv_core.so)
-#
-#add_library( cv_imgproc-lib SHARED IMPORTED)
-#set_target_properties(cv_imgproc-lib PROPERTIES IMPORTED_LOCATION ${OpenCV_DIR}/libs/${ANDROID_ABI}/libopencv_imgproc.so)
-#
-add_library( cv_imgcodecs-lib SHARED IMPORTED)
-set_target_properties(cv_imgcodecs PROPERTIES IMPORTED_LOCATION ${OpenCV_DIR}/libs/${ANDROID_ABI}/libopencv_imgcodecs.so)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -52,12 +69,10 @@ find_library( # Sets the name of the path variable.
 # build script, prebuilt third-party libraries, or system libraries.
 
 target_link_libraries( # Specifies the target library.
-         native-lib
+        native-lib
 
         lib_opencv
-#        cv_core-lib
-#        cv_imgproc-lib
-        cv_imgcodecs-lib
+
 
         # Links the target library to the log library
         # included in the NDK.

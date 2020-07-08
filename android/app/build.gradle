@@ -140,13 +140,13 @@ android {
              moduleName "helloworld"
              ldLibs "log"
          }
-//        externalNativeBuild {
-//            cmake {
-//                cppFlags "-frtti -fexceptions"
-//                abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
-//                arguments "-DOpenCV_DIR=" + opencvsdk + "/sdk/native"
-//            }
-//        }
+    //    externalNativeBuild {
+    //        cmake {
+    //            cppFlags "-frtti -fexceptions"
+    //            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+    //            arguments "-DOpenCV_DIR=" + opencvsdk + "/sdk/native"
+    //        }
+    //    }
     }
 
       // Here we can add source code to our project
@@ -164,6 +164,12 @@ android {
              path file('src/main/jni/Android.mk')
          }
      }
+    //        externalNativeBuild {
+    //        cmake {
+    //            path "src/main/cpp/CMakeLists.txt"
+    //            version "3.10.2"
+    //        }
+    //    }
     splits {
         abi {
             reset()
@@ -191,12 +197,6 @@ android {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
-//        externalNativeBuild {
-//            cmake {
-//                path "src/main/cpp/CMakeLists.txt"
-//                version "3.10.2"
-//            }
-//        }
     }
 
     packagingOptions {
