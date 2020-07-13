@@ -15,10 +15,11 @@ import {
 import ImagePicker from 'react-native-image-picker';
 
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { isIos } from './utils';
 
+import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
-import { isIos } from './utils/index';
 import { downloadAssetSource } from './utils/uriHelper';
 const imgTest = require('./assets/images/ball2.jpg');
 
@@ -28,6 +29,10 @@ const App = () => {
   const [resTennisBallOnTest, setResTennisBallOnTest] = useState<any>('');
   const [imageDisplayed, setImageDisplayed] = useState<any>('')
 
+  async function waitForTensorFlowJs() {
+    await tf.ready();
+    setTfReady(true);
+  }
 
   useEffect(() => {
     if (!isIos) requestReadWiteAndroidPermission();
@@ -105,6 +110,8 @@ const App = () => {
   }
 
   const [isModeTf, setModeTf] = useState(false)
+  const [isTfReady, setTfReady] = useState(false);
+
 
   return (
     <>
@@ -122,9 +129,13 @@ const App = () => {
               trackColor={{ true: "#767577", false: "#81b0ff" }}
               thumbColor={!isModeTf ? "#f5dd4b" : "#f4f3f4"}
               ios_backgroundColor="#3e3e3e"
-              onValueChange={() => { setModeTf(!isModeTf); }}
+              onValueChange={() => {
+                setModeTf(!isModeTf); if (!isModeTf) waitForTensorFlowJs()
+              }}
               value={isModeTf}
             />
+            {isModeTf && <Text style={{ textAlign: 'center', margin: 10 }}>{`tensorflow is ${isTfReady ? 'ready !' : 'NOT ready'}`}</Text>}
+
             <TouchableOpacity
               style={styles.button}
               onPress={runOnTheTestPhoto}>

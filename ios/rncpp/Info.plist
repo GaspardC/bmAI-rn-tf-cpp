@@ -44,7 +44,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Pour accéder à vos photos</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Pour accéder à votre position</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Pour accéder à vos photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
