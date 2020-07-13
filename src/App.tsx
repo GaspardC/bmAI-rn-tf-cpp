@@ -21,12 +21,15 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
 import { downloadAssetSource } from './utils/uriHelper';
+import { resizeImage, base64ImageToTensor, tensorToImageUrl_thomas } from './utils/tf_utils';
+import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
+import { Tensor4D } from '@tensorflow/tfjs';
 const imgTest = require('./assets/images/ball2.jpg');
 
 const { HelloWorld } = NativeModules;
 
 const App = () => {
-  const [resTennisBallOnTest, setResTennisBallOnTest] = useState<any>('');
+  const [resJSON, setResJSON] = useState<any>('');
   const [imageDisplayed, setImageDisplayed] = useState<any>('')
 
   async function waitForTensorFlowJs() {
@@ -43,13 +46,55 @@ const App = () => {
       .then(async (res) => {
         console.log('res', res);
         const resObj = JSON.parse(res);
-        setResTennisBallOnTest(resObj);
+        setResJSON(resObj);
       })
       .catch((e) => {
         console.log(e);
-        setResTennisBallOnTest({ error: "a problem occured during the detection" });
+        setResJSON({ error: "a problem occured during the detection" });
       });
   };
+
+  const processTFImg = async (uri: string) => {
+    try {
+      if (!isTfReady) {
+        //@ts-ignore
+        alert('Tensorflow not ready yet');
+        return waitForTensorFlowJs()
+      }
+
+      const modelJson = require('./src/assets/model/frozen/model.json');
+      const modelWeights = require('./src/assets/model/frozen/group1-shard1of1.bin');
+
+      const startTimeModel = Date.now();
+      const model = await tf.loadGraphModel(
+        bundleResourceIO(modelJson, modelWeights),
+      );
+
+      console.log(`loading model in ${Date.now() - startTimeModel}`);
+
+      const { uri: resizedUri, base64 } = await resizeImage(uri, 368);
+
+      const inputMat = await base64ImageToTensor(base64);
+      const startTime = Date.now();
+      const res = model.predict(inputMat) as Tensor4D;
+
+      console.log(`inference done elapsed time${Date.now() - startTime}`);
+      // alert(`inference done elapsed time${Date.now() - startTime}`);
+
+      // const imageUrl = await tensorToImageUrl(res);
+      const startTimeTfCode = Date.now();
+
+      const imageUrl = await tensorToImageUrl_thomas(res);
+      console.log(`tfcode ${Date.now() - startTimeTfCode}`);
+
+      setImageDisplayed({ uri: imageUrl });
+      console.log(`imageUrl ${imageUrl}`);
+    } catch (err) {
+      console.log('erreur model !');
+      console.log(err);
+    }
+  }
+
 
   const requestReadWiteAndroidPermission = async () => {
     try {
@@ -91,22 +136,23 @@ const App = () => {
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         console.log(source);
         setImageDisplayed({ uri: source.uri });
-        setResTennisBallOnTest('')
-        processCppImg(source.uriBoth);
+        setResJSON('')
+        isModeTf ? processTFImg(source.uriBoth) : processCppImg(source.uriBoth);
       }
     });
   };
+
 
   const runOnTheTestPhoto = async () => {
     const img = Image.resolveAssetSource(imgTest);
     const uriBoth = img.uri;
     console.log('img', img);
-    let sourceFile = await downloadAssetSource(uriBoth);
+    let sourceFile = await downloadAssetSource(uriBoth) as string;
     sourceFile = `file://${sourceFile}`
     console.log('sourceFile', sourceFile);
     setImageDisplayed('');
-    setResTennisBallOnTest('')
-    processCppImg(sourceFile);
+    setResJSON('')
+    isModeTf ? processTFImg(sourceFile) : processCppImg(sourceFile);
   }
 
   const [isModeTf, setModeTf] = useState(false)
@@ -142,10 +188,10 @@ const App = () => {
               <Text>Run on the test photo</Text>
             </TouchableOpacity>
             <Image resizeMode="contain" source={imageDisplayed !== '' ? imageDisplayed : imgTest} style={styles.imageTest} />
-            {resTennisBallOnTest !== '' && <Text>{`Results :
-            ${JSON.stringify(resTennisBallOnTest, null, 2)}`}
+            {resJSON !== '' && <Text>{`Results :
+            ${JSON.stringify(resJSON, null, 2)}`}
             </Text>}
-            {resTennisBallOnTest !== '' && isIos() && <Image resizeMode="contain" source={{ uri: resTennisBallOnTest.resUri, width: 200, height: 200 }} style={styles.imageTest} />
+            {resJSON !== '' && isIos() && <Image resizeMode="contain" source={{ uri: resJSON.resUri, width: 200, height: 200 }} style={styles.imageTest} />
             }
             <TouchableOpacity
               style={styles.button}
