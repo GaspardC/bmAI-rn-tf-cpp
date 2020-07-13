@@ -2,6 +2,6 @@
 [x86] Compile++      : helloworld <= hello_world_impl.cpp
 [x86] Compile++      : helloworld <= djinni_main.cpp
 [x86] Compile++      : helloworld <= djinni_support.cpp
-[x86] Prebuilt       : libopencv_java3.so <= /Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk/native/jni/../libs/x86/
+[x86] Prebuilt       : libopencv_java4.so <= /Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk/native/jni/../libs/x86/
 [x86] Prebuilt       : libc++_shared.so <= <NDK>/sources/cxx-stl/llvm-libc++/libs/x86/
 [x86] SharedLibrary  : libhelloworld.so

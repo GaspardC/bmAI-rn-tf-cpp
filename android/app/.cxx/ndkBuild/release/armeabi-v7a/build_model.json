@@ -13,8 +13,8 @@
       "buildSystem": "NDK_BUILD",
       "compilerSettingsCacheFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/.cxx",
       "cxxFolder": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx",
-      "ndkFolder": "/Users/Gasp/Library/Android/sdk/ndk/18.1.5063045",
-      "ndkVersion": "18.1.5063045",
+      "ndkFolder": "/Users/Gasp/Library/Android/sdk/ndk/21.3.6528147",
+      "ndkVersion": "21.3.6528147",
       "ndkSupportedAbiList": [
         "ARMEABI_V7A",
         "ARM64_V8A",

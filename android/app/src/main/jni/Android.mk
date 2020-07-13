@@ -43,8 +43,8 @@ include ${OPENCVROOT}/sdk/native/jni/OpenCV.mk
 LOCAL_MODULE := helloworld
 
 # Specify C++ flags
-LOCAL_CPPFLAGS := -lopencv_imgcodecs
 LOCAL_CPPFLAGS := -std=c++17
+LOCAL_CPPFLAGS += -lopencv_imgcodecs
 LOCAL_CPPFLAGS += -fexceptions
 LOCAL_CPPFLAGS += -frtti
 LOCAL_CPPFLAGS += -Wall

@@ -299,7 +299,9 @@ namespace helloworld
         //TODO add for ios
 
         if (isIos)
-            imwrite(trim_uri_protocal(result_uri), result_image);
+        {
+            cv::imwrite(trim_uri_protocal(result_uri), result_image);
+        }
         // cv::imwrite(trim_uri_protocal(result_uri), result_image);
         return result_uri;
     }
@@ -313,14 +315,14 @@ namespace helloworld
         // cv::namedWindow("edges", 1);
         cv::Mat frame;
         //    frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball_horiz.JPG");
-        //        frame = cv::imread("/storage/1115-2412/Android/data/com.rncpp/files/ball2.jpg", cv::IMREAD_COLOR);
+        // frame = cv::imread("/storage/1115-2412/Android/data/com.rncpp/files/ball2.jpg", cv::IMREAD_COLOR);
 
         // cv::String inputStr;
         // inputStr = "/data/user/0/com.rncpp/files/ball2.jpg";
         // inputStr = "/data/data/com.rncpp/files/ball2.jpg";
         // frame = cv::imread(inputStr, cv::IMREAD_COLOR);
         // return (uri);
-        frame = cv::imread(trim_uri_protocal(uri), cv::IMREAD_COLOR);
+        frame = cv::imread(trim_uri_protocal(uri));
         //        frame = cv::imread(uri);
 
         if (frame.empty())

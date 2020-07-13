@@ -10,6 +10,7 @@ import {
   StatusBar,
   NativeModules,
   PermissionsAndroid,
+  Switch
 } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
 
@@ -29,7 +30,6 @@ const App = () => {
 
 
   useEffect(() => {
-    // console.log(Permissions);
     if (!isIos) requestReadWiteAndroidPermission();
   }, []);
 
@@ -104,6 +104,8 @@ const App = () => {
     processCppImg(sourceFile);
   }
 
+  const [isModeTf, setModeTf] = useState(false)
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
@@ -113,15 +115,23 @@ const App = () => {
           style={styles.scrollView}>
           <View style={styles.body}>
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>bmAI Poc app</Text>
+              <Text style={styles.sectionTitle}>{`bmAI Poc app detection on the : ${isModeTf ? 'skeletton' : 'tennis ball'}`}</Text>
             </View>
+            <Switch
+              style={{ margin: 10 }}
+              trackColor={{ true: "#767577", false: "#81b0ff" }}
+              thumbColor={!isModeTf ? "#f5dd4b" : "#f4f3f4"}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => { setModeTf(!isModeTf); }}
+              value={isModeTf}
+            />
             <TouchableOpacity
               style={styles.button}
               onPress={runOnTheTestPhoto}>
               <Text>Run on the test photo</Text>
             </TouchableOpacity>
             <Image resizeMode="contain" source={imageDisplayed !== '' ? imageDisplayed : imgTest} style={styles.imageTest} />
-            {resTennisBallOnTest !== '' && <Text>{`Tennis ball detected :
+            {resTennisBallOnTest !== '' && <Text>{`Results :
             ${JSON.stringify(resTennisBallOnTest, null, 2)}`}
             </Text>}
             {resTennisBallOnTest !== '' && isIos() && <Image resizeMode="contain" source={{ uri: resTennisBallOnTest.resUri, width: 200, height: 200 }} style={styles.imageTest} />
@@ -173,6 +183,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '600',
     color: Colors.black,
+    textAlign: 'center',
   },
   sectionDescription: {
     marginTop: 8,

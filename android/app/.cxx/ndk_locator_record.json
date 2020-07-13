@@ -3,7 +3,7 @@
   "messages": [
     {
       "level": "INFO",
-      "message": "android.ndkVersion from module build.gradle is not set"
+      "message": "android.ndkVersion from module build.gradle is 21.3.6528147"
     },
     {
       "level": "INFO",
@@ -27,19 +27,11 @@
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/Gasp/Library/Android/sdk/ndk/17.2.4988734 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
       "message": "Considering /Users/Gasp/Library/Android/sdk/ndk/21.3.6528147 in SDK ndk folder"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/Gasp/Library/Android/sdk/ndk/18.1.5063045 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Found requested ndk.dir (/Users/Gasp/Library/Android/sdk/ndk/21.3.6528147) which has version 21.3.6528147"
+      "message": "Choosing /Users/Gasp/Library/Android/sdk/ndk/21.3.6528147 from ndk.dir which had the requested version 21.3.6528147"
     }
   ]
 }

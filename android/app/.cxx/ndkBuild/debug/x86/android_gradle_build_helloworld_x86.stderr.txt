@@ -13,10 +13,4 @@
 /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:274:42: warning: unused parameter 'mask_high' [-Wunused-parameter]
                                 cv::Mat &mask_high)
                                          ^
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:295:50: warning: unused parameter 'result_image' [-Wunused-parameter]
-    std::string save_result_image(const cv::Mat &result_image, const std::string &uri)
-                                                 ^
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:402:87: warning: unused parameter 'isIos' [-Wunused-parameter]
-    std::string HelloWorldImpl::analyze_image(const std::string &photoUri, const bool isIos)
-                                                                                      ^
-7 warnings generated.
+5 warnings generated.
