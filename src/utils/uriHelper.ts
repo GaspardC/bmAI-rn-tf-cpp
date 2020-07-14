@@ -43,7 +43,7 @@ export async function downloadAssetSource(uri) {
                         resolve(filename)
                     }
                     else {
-                        reject('File at ' + filename + ' not downloaded.  Status code: ' + ret.statusCode)
+                        reject('File at ' + filename + ' not downloaded.  Status code: ' + res.statusCode)
                     }
                 })
                     .catch((err) => {

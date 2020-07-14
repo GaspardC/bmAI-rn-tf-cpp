@@ -10,6 +10,7 @@ import {
   StatusBar,
   NativeModules,
   PermissionsAndroid,
+  ActivityIndicator,
   Switch
 } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
@@ -31,6 +32,9 @@ const { HelloWorld } = NativeModules;
 const App = () => {
   const [resJSON, setResJSON] = useState<any>('');
   const [imageDisplayed, setImageDisplayed] = useState<any>('')
+  const [isModeTf, setModeTf] = useState(false)
+  const [isTfReady, setTfReady] = useState(false);
+  const [isLoading, setLoading] = useState(false)
 
   async function waitForTensorFlowJs() {
     await tf.ready();
@@ -42,16 +46,20 @@ const App = () => {
   }, []);
 
   const processCppImg = (uriBoth) => {
-    HelloWorld.sayHello(uriBoth)
-      .then(async (res) => {
-        console.log('res', res);
-        const resObj = JSON.parse(res);
-        setResJSON(resObj);
-      })
-      .catch((e) => {
-        console.log(e);
-        setResJSON({ error: "a problem occured during the detection" });
-      });
+    return new Promise((resolve, reject) => {
+      HelloWorld.sayHello(uriBoth)
+        .then(async (res) => {
+          console.log('res', res);
+          const resObj = JSON.parse(res);
+          setResJSON(resObj);
+          resolve(resObj)
+        })
+        .catch((e) => {
+          console.log(e);
+          setResJSON({ error: "a problem occured during the detection" });
+          reject(e)
+        });
+    })
   };
 
   const processTFImg = async (uri: string) => {
@@ -62,8 +70,8 @@ const App = () => {
         return waitForTensorFlowJs()
       }
 
-      const modelJson = require('./src/assets/model/frozen/model.json');
-      const modelWeights = require('./src/assets/model/frozen/group1-shard1of1.bin');
+      const modelJson = require('./assets/model/frozen/model.json');
+      const modelWeights = require('./assets/model/frozen/group1-shard1of1.bin');
 
       const startTimeModel = Date.now();
       const model = await tf.loadGraphModel(
@@ -87,7 +95,7 @@ const App = () => {
       const imageUrl = await tensorToImageUrl_thomas(res);
       console.log(`tfcode ${Date.now() - startTimeTfCode}`);
 
-      setImageDisplayed({ uri: imageUrl });
+      setResJSON({ uri: `data:image/jpeg;base64,${imageUrl}` });
       console.log(`imageUrl ${imageUrl}`);
     } catch (err) {
       console.log('erreur model !');
@@ -135,12 +143,22 @@ const App = () => {
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
         console.log(source);
-        setImageDisplayed({ uri: source.uri });
-        setResJSON('')
-        isModeTf ? processTFImg(source.uriBoth) : processCppImg(source.uriBoth);
+        run(source)
+
       }
     });
   };
+
+  const run = ({ uri, uriBoth }: { uri: string, uriBoth?: string }) => {
+    const toBeporcesseduri = uriBoth == null ? uri : uriBoth
+    setImageDisplayed({ uri });
+    setResJSON('')
+    setLoading(true)
+    const promise = isModeTf ? processTFImg(toBeporcesseduri) : processCppImg(toBeporcesseduri);
+    promise.finally(() => {
+      setLoading(false);
+    })
+  }
 
 
   const runOnTheTestPhoto = async () => {
@@ -150,13 +168,9 @@ const App = () => {
     let sourceFile = await downloadAssetSource(uriBoth) as string;
     sourceFile = `file://${sourceFile}`
     console.log('sourceFile', sourceFile);
-    setImageDisplayed('');
-    setResJSON('')
-    isModeTf ? processTFImg(sourceFile) : processCppImg(sourceFile);
+    run({ uri: sourceFile })
   }
 
-  const [isModeTf, setModeTf] = useState(false)
-  const [isTfReady, setTfReady] = useState(false);
 
 
   return (
@@ -187,12 +201,18 @@ const App = () => {
               onPress={runOnTheTestPhoto}>
               <Text>Run on the test photo</Text>
             </TouchableOpacity>
-            <Image resizeMode="contain" source={imageDisplayed !== '' ? imageDisplayed : imgTest} style={styles.imageTest} />
-            {resJSON !== '' && <Text>{`Results :
+            <Image resizeMode="contain"
+              source={imageDisplayed !== '' ? imageDisplayed : imgTest}
+              style={styles.imageTest} />
+            {resJSON !== '' && !isModeTf && <Text>{`Results :
             ${JSON.stringify(resJSON, null, 2)}`}
             </Text>}
-            {resJSON !== '' && isIos() && <Image resizeMode="contain" source={{ uri: resJSON.resUri, width: 200, height: 200 }} style={styles.imageTest} />
+            {resJSON !== '' && isIos() && <Image resizeMode="contain" source={{
+              ...!isModeTf && { uri: resJSON.resUri, width: 200, height: 200 },
+              ...isModeTf && resJSON
+            }} style={styles.imageTest} />
             }
+            {isLoading && <ActivityIndicator />}
             <TouchableOpacity
               style={styles.button}
               onPress={openPicker}>
@@ -224,7 +244,9 @@ const styles = StyleSheet.create({
     right: 0,
   },
   imageTest: {
-    width: 200, height: 200, marginVertical: 10
+    width: 200,
+    height: 200,
+    marginVertical: 10,
   },
   body: {
     flex: 1,
