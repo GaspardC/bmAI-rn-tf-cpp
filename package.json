@@ -13,11 +13,13 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.11.0",
+    "@sentry/react-native": "^1.6.2",
     "@tensorflow-models/blazeface": "^0.0.5",
     "@tensorflow-models/mobilenet": "^2.0.4",
     "@tensorflow-models/posenet": "^2.2.1",
     "@tensorflow/tfjs": "^2.0.1",
     "@tensorflow/tfjs-react-native": "^0.3.0",
+    "expo-asset": "^8.1.7",
     "expo-camera": "^8.2.0",
     "expo-gl": "^8.2.0",
     "expo-gl-cpp": "^8.2.0",

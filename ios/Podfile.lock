@@ -331,8 +331,14 @@ PODS:
     - React
   - RNFS (2.16.6):
     - React
+  - RNSentry (1.6.2):
+    - React
+    - Sentry (~> 5.1.8)
   - RNSVG (12.1.0):
     - React
+  - Sentry (5.1.9):
+    - Sentry/Core (= 5.1.9)
+  - Sentry/Core (5.1.9)
   - UMAppLoader (1.0.2)
   - UMBarCodeScannerInterface (5.1.0)
   - UMCameraInterface (5.1.0)
@@ -413,6 +419,7 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - RNFS (from `../node_modules/react-native-fs`)
+  - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNSVG (from `../node_modules/react-native-svg`)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
   - UMBarCodeScannerInterface (from `../node_modules/unimodules-barcode-scanner-interface/ios`)
@@ -443,6 +450,7 @@ SPEC REPOS:
     - FlipperKit
     - OpenCV
     - OpenSSL-Universal
+    - Sentry
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -516,6 +524,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/async-storage"
   RNFS:
     :path: "../node_modules/react-native-fs"
+  RNSentry:
+    :path: "../node_modules/@sentry/react-native"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   UMAppLoader:
@@ -595,7 +605,9 @@ SPEC CHECKSUMS:
   ReactCommon: ed4e11d27609d571e7eee8b65548efc191116eb3
   RNCAsyncStorage: d059c3ee71738c39834a627476322a5a8cd5bf36
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
+  RNSentry: 9d68f0ce79608e90e10ac320c409321efc114b8f
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
+  Sentry: 81f7f2bd3cb041137ea7efcde3aa5ad0d5a67632
   UMAppLoader: ee77a072f9e15128f777ccd6d2d00f52ab4387e6
   UMBarCodeScannerInterface: 9dc692b87e5f20fe277fa57aa47f45d418c3cc6c
   UMCameraInterface: 625878bbf2ba188a8548675e1d1d2e438a653e6d
@@ -612,6 +624,6 @@ SPEC CHECKSUMS:
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 626bbad99578dbd8931446769479039a2d75c059
+PODFILE CHECKSUM: 30b2978bb63f953c202dbf9811b6c71984bb2231
 
 COCOAPODS: 1.9.0

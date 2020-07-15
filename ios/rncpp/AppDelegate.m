@@ -31,8 +31,8 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 
 //@interface AppDelegate : UIResponder <UIApplicationDelegate, RCTBridgeDelegate>
-@interface AppDelegate () <UIApplicationDelegate, RCTBridgeDelegate>
-
+//@interface AppDelegate () <UIApplicationDelegate, RCTBridgeDelegate>
+@interface AppDelegate () <RCTBridgeDelegate>
 
 @property (nonatomic, strong) UMModuleRegistryAdapter *moduleRegistryAdapter;
 

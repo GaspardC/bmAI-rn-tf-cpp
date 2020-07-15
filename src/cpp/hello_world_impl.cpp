@@ -298,10 +298,10 @@ namespace helloworld
         std::string result_uri = get_result_uri(uri);
         //TODO add for ios
 
-        if (isIos)
-        {
-            cv::imwrite(trim_uri_protocal(result_uri), result_image);
-        }
+        // if (isIos)
+        // {
+        //     cv::imwrite(trim_uri_protocal(result_uri), result_image);
+        // }
         // cv::imwrite(trim_uri_protocal(result_uri), result_image);
         return result_uri;
     }

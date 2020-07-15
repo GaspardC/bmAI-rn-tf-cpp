@@ -21,10 +21,11 @@ import { isIos } from './utils';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
-import { downloadAssetSource } from './utils/uriHelper';
+import { downloadAssetSource, getFilePath, getFileUri } from './utils/uriHelper';
 import { resizeImage, base64ImageToTensor, tensorToImageUrl_thomas } from './utils/tf_utils';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { Tensor4D } from '@tensorflow/tfjs';
+import { initSentry, isDev } from './utils/index';
 const imgTest = require('./assets/images/ball2.jpg');
 
 const { HelloWorld } = NativeModules;
@@ -43,6 +44,7 @@ const App = () => {
 
   useEffect(() => {
     if (!isIos) requestReadWiteAndroidPermission();
+    initSentry()
   }, []);
 
   const processCppImg = (uriBoth) => {
@@ -50,7 +52,13 @@ const App = () => {
       HelloWorld.sayHello(uriBoth)
         .then(async (res) => {
           console.log('res', res);
-          const resObj = JSON.parse(res);
+          let resObj = JSON.parse(res);
+          if (isIos()) {
+            // resObj.resUri = resObj?.resUri?.replace('file://', '')
+            // resObj.resSource = uriBoth;
+            const resUri = await getFileUri(resObj.resUri);
+            resObj.resUri = resUri
+          }
           setResJSON(resObj);
           resolve(resObj)
         })
@@ -87,7 +95,6 @@ const App = () => {
       const res = model.predict(inputMat) as Tensor4D;
 
       console.log(`inference done elapsed time${Date.now() - startTime}`);
-      // alert(`inference done elapsed time${Date.now() - startTime}`);
 
       // const imageUrl = await tensorToImageUrl(res);
       const startTimeTfCode = Date.now();
@@ -95,7 +102,7 @@ const App = () => {
       const imageUrl = await tensorToImageUrl_thomas(res);
       console.log(`tfcode ${Date.now() - startTimeTfCode}`);
 
-      setResJSON({ uri: `data:image/jpeg;base64,${imageUrl}` });
+      setResJSON({ resUri: `data:image/jpeg;base64,${imageUrl}` });
       console.log(`imageUrl ${imageUrl}`);
     } catch (err) {
       console.log('erreur model !');
@@ -165,9 +172,10 @@ const App = () => {
     const img = Image.resolveAssetSource(imgTest);
     const uriBoth = img.uri;
     console.log('img', img);
-    let sourceFile = await downloadAssetSource(uriBoth) as string;
-    sourceFile = `file://${sourceFile}`
-    console.log('sourceFile', sourceFile);
+    const sourceFile = await getFilePath(imgTest)
+
+    // sourceFile = `file://${sourceFile}`
+    // console.log('sourceFile', sourceFile);
     run({ uri: sourceFile })
   }
 
@@ -191,6 +199,7 @@ const App = () => {
               ios_backgroundColor="#3e3e3e"
               onValueChange={() => {
                 setModeTf(!isModeTf); if (!isModeTf) waitForTensorFlowJs()
+                setResJSON('')
               }}
               value={isModeTf}
             />
@@ -207,10 +216,7 @@ const App = () => {
             {resJSON !== '' && !isModeTf && <Text>{`Results :
             ${JSON.stringify(resJSON, null, 2)}`}
             </Text>}
-            {resJSON !== '' && isIos() && <Image resizeMode="contain" source={{
-              ...!isModeTf && { uri: resJSON.resUri, width: 200, height: 200 },
-              ...isModeTf && resJSON
-            }} style={styles.imageTest} />
+            {resJSON !== '' && isIos() && (isDev() || isModeTf) && <Image resizeMode="contain" source={{ uri: resJSON.resUri, width: 200, height: 200 }} style={styles.imageTest} />
             }
             {isLoading && <ActivityIndicator />}
             <TouchableOpacity

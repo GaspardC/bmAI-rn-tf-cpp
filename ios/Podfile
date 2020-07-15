@@ -1,5 +1,6 @@
 platform :ios, '10.0'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+require_relative '../node_modules/react-native-unimodules/cocoapods.rb'
 
 def add_flipper_pods!(versions = {})
   versions['Flipper'] ||= '~> 0.37.0'
@@ -81,13 +82,9 @@ target 'rncpp' do
 
   pod 'OpenCV'
 
-  target 'rncppTests' do
-    inherit! :complete
-    # Pods for testing
-  end
-
-  use_unimodules!
   use_native_modules!
+  use_unimodules!
+
 
   # Enables Flipper.
   #
@@ -99,11 +96,4 @@ target 'rncpp' do
   end
 end
 
-target 'rncpp-tvOS' do
-  # Pods for rncpp-tvOS
 
-  target 'rncpp-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-end
