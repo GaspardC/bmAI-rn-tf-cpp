@@ -216,7 +216,7 @@ const App = () => {
             {resJSON !== '' && !isModeTf && <Text>{`Results :
             ${JSON.stringify(resJSON, null, 2)}`}
             </Text>}
-            {resJSON !== '' && isIos() && (isDev() || isModeTf) && <Image resizeMode="contain" source={{ uri: resJSON.resUri, width: 200, height: 200 }} style={styles.imageTest} />
+            {resJSON !== '' && isModeTf && <Image resizeMode="contain" source={{ uri: resJSON.resUri, width: 200, height: 200 }} style={styles.imageTest} />
             }
             {isLoading && <ActivityIndicator />}
             <TouchableOpacity

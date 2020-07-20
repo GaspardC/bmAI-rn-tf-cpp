@@ -11,16 +11,17 @@ namespace helloworld
         return (T(0) < val) - (val < T(0));
     }
 
-    tuple<cv::Mat, float> resize(cv::Mat inputMat, float h_max = 600.0)
+    tuple<cv::Mat,cv::Mat, float> resize(cv::Mat inputMat, float h_max = 600.0)
     {
         cv::Mat image;
-        //    if(inputMat.rows < inputMat.cols){
-        //        cv::transpose(inputMat,inputMat);
-        //        cv::flip(inputMat, inputMat,1);
-        //    };
+        if (inputMat.rows < inputMat.cols)
+        {
+            cv::transpose(inputMat, inputMat);
+            cv::flip(inputMat, inputMat, 1);
+        };
         float fx = h_max / inputMat.rows;
         cv::resize(inputMat, image, cv::Size(), fx, fx);
-        return {image, fx};
+        return {image, inputMat, fx};
     }
 
     tuple<cv::Mat, cv::Mat, cv::Mat> bgr2lab_polar(const cv::Mat &inputMat)
@@ -332,7 +333,7 @@ namespace helloworld
             return "cannot read image : empty!";
         }
         //  Step 1 resize image to a lower resolution
-        auto [image, fx] = resize(frame, 600);
+        auto [image, frameOrient, fx] = resize(frame, 600);
 
         // Detect ball in hsv -> contour + hue range
         auto [l, theta, r] = bgr2lab_polar(image);
@@ -349,12 +350,12 @@ namespace helloworld
         // Extract most probable bbox for ball
         auto [_, img_filtered] = find_ball(mask_low);
         auto [bbox, _unsuedImg2] = find_ball(img_filtered);
-        auto bbox_re = get_bbox_rescaled(bbox, fx, frame.cols, frame.rows);
+        auto bbox_re = get_bbox_rescaled(bbox, fx, frameOrient.cols, frameOrient.rows);
 
         // STEP 2: Process image full resolution for precision
         //(min_row, min_col, max_row, max_col).
         auto roi = cv::Rect(bbox_re[1], bbox_re[0], bbox_re[3] - bbox_re[1], bbox_re[2] - bbox_re[0]);
-        cv::Mat image_high(frame, roi);
+        cv::Mat image_high(frameOrient, roi);
 
         auto [l_high, theta_high, r_high] = bgr2lab_polar(image_high);
 
@@ -381,7 +382,7 @@ namespace helloworld
         auto b = ellipse_values[3];
 
         auto radius = sqrt((float)a * b);
-        auto imgRes = draw_detection_details(frame, x_mean, y_mean, radius, bbox_re[0], bbox_re[1], mask_high);
+        auto imgRes = draw_detection_details(frameOrient, x_mean, y_mean, radius, bbox_re[0], bbox_re[1], mask_high);
         auto resUri = save_result_image(imgRes, uri, isIos);
 
         auto REF_TENNIS_BALL = 6.7 / 2;
