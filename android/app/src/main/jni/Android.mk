@@ -14,6 +14,10 @@ NDK_DEBUG=1
 
 # Specify C++ flags
 LOCAL_CPPFLAGS := -std=c++17
+LOCAL_CPPFLAGS  := -DWORD
+LOCAL_CPPFLAGS := -lopencv_imgcodecs
+LOCAL_CPPFLAGS += -lopencv_imgproc
+LOCAL_CPPFLAGS := -lopencv_core
 LOCAL_CPPFLAGS += -fexceptions
 LOCAL_CPPFLAGS += -frtti
 LOCAL_CPPFLAGS += -Wall
@@ -36,7 +40,20 @@ OPENCV_CAMERA_MODULES:=off
 OPENCV_INSTALL_MODULES:=on
 OPENCV_LIB_TYPE:=SHARED
 OPENCV_INSTALL_MODULES:=on
-# LOCAL_STATIC_LIBRARIES += libopencv_contrib libopencv_legacy libopencv_ml libopencv_stitching libopencv_nonfree libopencv_objdetect libopencv_videostab libopencv_calib3d libopencv_photo libopencv_video libopencv_features2d libopencv_highgui libopencv_androidcamera libopencv_flann libopencv_imgproc libopencv_ts libopencv_core
+
+#LOCAL_LDLIBS := -L$(OPENCVROOT)/sdk/native/libs/x86_64/
+#LOCAL_LDLIBS += -lopencv_core
+#LOCAL_LDLIBS += -lopencv_imgproc
+#LOCAL_LDLIBS += -lopencv_highgui
+#LOCAL_LDLIBS += -lopencv_imgcodecs
+#LOCAL_LDLIBS += -lopencv_photo
+#LOCAL_LDLIBS += -llog
+
+#APP_ALLOW_MISSING_DEPS=true
+
+
+#LOCAL_SHARED_LIBRARIES += libopencv_core
+#LOCAL_SHARED_LIBRARIES += libopencv_contrib libopencv_legacy libopencv_ml libopencv_stitching libopencv_nonfree libopencv_objdetect libopencv_videostab libopencv_calib3d libopencv_photo libopencv_video libopencv_features2d libopencv_highgui libopencv_androidcamera libopencv_flann libopencv_imgproc libopencv_ts libopencv_core
 include ${OPENCVROOT}/sdk/native/jni/OpenCV.mk
 
 

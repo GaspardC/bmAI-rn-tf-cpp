@@ -13,10 +13,10 @@
 /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:275:42: warning: unused parameter 'mask_high' [-Wunused-parameter]
                                 cv::Mat &mask_high)
                                          ^
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:296:50: warning: unused parameter 'result_image' [-Wunused-parameter]
-    std::string save_result_image(const cv::Mat &result_image, const std::string &uri, const bool isIos)
-                                                 ^
 /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:296:99: warning: unused parameter 'isIos' [-Wunused-parameter]
     std::string save_result_image(const cv::Mat &result_image, const std::string &uri, const bool isIos)
                                                                                                   ^
-7 warnings generated.
+6 warnings generated.
+src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:306: error: undefined reference to 'cv::imwrite(cv::String const&, cv::_InputArray const&, std::__ndk1::vector<int, std::__ndk1::allocator<int> > const&)'
+clang++: error: linker command failed with exit code 1 (use -v to see invocation)
+make: *** [/Users/Gasp/Library/Android/sdk/ndk/21.3.6528147/build/core/build-binary.mk:725: /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/debug/obj/local/x86_64/libhelloworld.so] Error 1

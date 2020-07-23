@@ -41,6 +41,37 @@ export async function base64ImageToTensor(base64: string):
     return tf.tensor4d(buffer, [1, height, width, 3]);
 }
 
+
+
+type Ellipse = { x_c, y_c, _, a, b }
+
+export async function draw_ellipse_full_tf(ball_dict: Ellipse, resolution) {
+    // Draws the ellipse representing the tennis ball mask using only the tf library.
+    // :param ball_dict: dictionary containing the coordinates of the tennis ball as return by the detect function.
+    // :param resolution: resolution of the input image.
+    // :return: binary mask of the tennis ball.
+
+    const x_t = tf.linspace(0., resolution[1], resolution[1] + 1);
+    const y_t = tf.linspace(0., resolution[0], resolution[0] + 1)
+    // x_grid_t, y_grid_t = tf.mes(x_t, y_t)
+
+
+}
+
+
+
+/**
+ * Builds a set of features from the ball's mask and the output of the skeleton model using only TF functions.
+ * :param heat_maps_t: intensity maps for each joint as a TF tensor.
+ * :param paf_maps_t: intensity maps for each limb as a TF tensor.
+ * :param ball_mask: binary mask of the detected tennis ball as a TF tensor.
+ * :return: features maps with shape [batch, height, width, 3] as a TF tensor.
+ * */
+
+export async function build_features_full_tf(heat_maps_t: tf.Tensor4D, paf_maps_t: tf.Tensor4D, ball_mask: tf.Tensor2D, body_mask) {
+
+
+}
 export async function tensorToImageUrl_thomas(output_maps_t: tf.Tensor4D) {
     // # Get tensor from numpy array
     // const output_maps_t = tf.compat.v1.convert_to_tensor(output_maps)

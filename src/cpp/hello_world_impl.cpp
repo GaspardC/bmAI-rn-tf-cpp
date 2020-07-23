@@ -11,7 +11,7 @@ namespace helloworld
         return (T(0) < val) - (val < T(0));
     }
 
-    tuple<cv::Mat,cv::Mat, float> resize(cv::Mat inputMat, float h_max = 600.0)
+    tuple<cv::Mat, cv::Mat, float> resize(cv::Mat inputMat, float h_max = 600.0)
     {
         cv::Mat image;
         if (inputMat.rows < inputMat.cols)
@@ -301,7 +301,7 @@ namespace helloworld
 
         // if (isIos)
         // {
-        //     cv::imwrite(trim_uri_protocal(result_uri), result_image);
+        //     // cv::imwrite(trim_uri_protocal(result_uri), result_image);
         // }
         // cv::imwrite(trim_uri_protocal(result_uri), result_image);
         return result_uri;
@@ -309,20 +309,11 @@ namespace helloworld
 
     string launch_detection(const std::string &uri, const bool isIos)
     {
-        //  std::cout << "Starting the tennis ball detection" << std::endl;
         cv::Mat res;
         cv::Mat edges;
 
-        // cv::namedWindow("edges", 1);
         cv::Mat frame;
-        //    frame = cv::imread("/Users/Gasp/Development/TennisBall/newCpp/ball_horiz.JPG");
-        // frame = cv::imread("/storage/1115-2412/Android/data/com.rncpp/files/ball2.jpg", cv::IMREAD_COLOR);
 
-        // cv::String inputStr;
-        // inputStr = "/data/user/0/com.rncpp/files/ball2.jpg";
-        // inputStr = "/data/data/com.rncpp/files/ball2.jpg";
-        // frame = cv::imread(inputStr, cv::IMREAD_COLOR);
-        // return (uri);
         frame = cv::imread(trim_uri_protocal(uri));
         //        frame = cv::imread(uri);
 
@@ -349,6 +340,16 @@ namespace helloworld
 
         // Extract most probable bbox for ball
         auto [_, img_filtered] = find_ball(mask_low);
+
+        // // early return mask_low : new version
+        // // Apply a last cleaning step
+        // morphologyEx(img_filtered, mask_low, cv::MORPH_OPEN, get_disk(10));
+
+        // cv::Mat flat = mask_low.reshape(1, mask_low.total() * mask_low.channels());
+        // std::vector<uint8_t> vec = mask_low.isContinuous() ? flat : flat.clone();
+
+        // return vector;
+
         auto [bbox, _unsuedImg2] = find_ball(img_filtered);
         auto bbox_re = get_bbox_rescaled(bbox, fx, frameOrient.cols, frameOrient.rows);
 
