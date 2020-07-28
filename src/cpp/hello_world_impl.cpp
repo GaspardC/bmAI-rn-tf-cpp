@@ -267,8 +267,9 @@ namespace helloworld
         auto U1 = U.row(1);
         auto a = sqrt((double)2 / X.size()) * S0 * cv::norm(U0);
         auto b = sqrt((double)2 / X.size()) * S1 * cv::norm(U1);
-        vector<double> vect{x_mean, y_mean, a, b};
-        return vect;
+        return std::make_tuple(x_mean, y_mean, a, b, U);
+        // vector<double> vect{x_mean, y_mean, a, b};
+        // return vect;
     }
 
     auto draw_detection_details(cv::Mat &image_high, float x_mean, float y_mean, float r, float minRow, float minCol,
@@ -375,12 +376,16 @@ namespace helloworld
         cv::Mat edge;
         cv::Canny(imgHigh, edge, 200, 255);
 
-        // x_mean, y_mean, a, b
+        //    x_mean, y_mean, a, b
         auto ellipse_values = get_fitting_ellipse(edge);
-        auto x_mean = ellipse_values[0];
-        auto y_mean = ellipse_values[1];
-        auto a = ellipse_values[2];
-        auto b = ellipse_values[3];
+        auto x_mean = get<0>(ellipse_values);
+        auto y_mean = get<1>(ellipse_values);
+        auto a = get<2>(ellipse_values);
+        auto b = get<3>(ellipse_values);
+        auto U = get<4>(ellipse_values);
+
+        // convert U to string
+        string sU = "[" + to_string(U.at<float>(0, 0)) + "," + to_string(U.at<float>(0, 1)) + "," + to_string(U.at<float>(1, 0)) + "," + to_string(U.at<float>(1, 1)) + "]";
 
         auto radius = sqrt((float)a * b);
         auto imgRes = draw_detection_details(frameOrient, x_mean, y_mean, radius, bbox_re[0], bbox_re[1], mask_high);
@@ -391,7 +396,7 @@ namespace helloworld
         // values to return
         auto value = REF_TENNIS_BALL / (2 * radius);
         vector<double> vect{x_mean, y_mean, a, b};
-        auto resStr = "{\"value\":\"" + to_string(value) + R"(", "x_mean":")" + to_string(x_mean) + R"(", "y_mean":")" + to_string(y_mean) + R"(", "a":")" + to_string(a) + R"(", "b":")" + to_string(b) + R"(", "resUri":")" + resUri + "\"}";
+        auto resStr = "{\"value\":\"" + to_string(value) + R"(", "x_mean":")" + to_string(x_mean) + R"(", "y_mean":")" + to_string(y_mean) + R"(", "a":")" + to_string(a) + R"(", "b":")" + to_string(b) + R"(", "sU":")" + sU + "\"}";
         return resStr;
     }
 

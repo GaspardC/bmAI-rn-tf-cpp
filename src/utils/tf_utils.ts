@@ -2,7 +2,14 @@
 import * as tf from '@tensorflow/tfjs';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as jpeg from 'jpeg-js';
-import { image } from '@tensorflow/tfjs';
+import { image, scalar } from '@tensorflow/tfjs';
+
+// Height and width of the input features of the second model
+const FEATURES_SIZE: [number, number] = [92, 92]
+const LIMBS_DROP_INDEXES = [9, 13]
+const N_LIMBS = 19
+const N_RELEVANT_LIMBS = 17;
+const N_RELEVANT_JOINTS = 18;
 
 export function toDataUri(base64: string): string {
     return `data:image/jpeg;base64,${base64}`;
@@ -42,24 +49,6 @@ export async function base64ImageToTensor(base64: string):
 }
 
 
-
-type Ellipse = { x_c, y_c, _, a, b }
-
-export async function draw_ellipse_full_tf(ball_dict: Ellipse, resolution) {
-    // Draws the ellipse representing the tennis ball mask using only the tf library.
-    // :param ball_dict: dictionary containing the coordinates of the tennis ball as return by the detect function.
-    // :param resolution: resolution of the input image.
-    // :return: binary mask of the tennis ball.
-
-    const x_t = tf.linspace(0., resolution[1], resolution[1] + 1);
-    const y_t = tf.linspace(0., resolution[0], resolution[0] + 1)
-    // x_grid_t, y_grid_t = tf.mes(x_t, y_t)
-
-
-}
-
-
-
 /**
  * Builds a set of features from the ball's mask and the output of the skeleton model using only TF functions.
  * :param heat_maps_t: intensity maps for each joint as a TF tensor.
@@ -68,9 +57,55 @@ export async function draw_ellipse_full_tf(ball_dict: Ellipse, resolution) {
  * :return: features maps with shape [batch, height, width, 3] as a TF tensor.
  * */
 
-export async function build_features_full_tf(heat_maps_t: tf.Tensor4D, paf_maps_t: tf.Tensor4D, ball_mask: tf.Tensor2D, body_mask) {
+export async function build_features_full_tf(heat_maps_t: tf.Tensor4D, paf_maps_t: tf.Tensor4D, ball_mask: tf.Tensor2D, body_mask?) {
 
+    // Resize the ball mask
+    let ballMask: tf.Tensor4D = tf.expandDims(tf.expandDims(ball_mask, 0), 3);
+    ballMask = tf.image.resizeNearestNeighbor(ballMask, FEATURES_SIZE)
 
+    // Resize the maps
+    const heat_maps = tf.image.resizeNearestNeighbor(heat_maps_t, FEATURES_SIZE)
+    const paf_maps = tf.image.resizeNearestNeighbor(paf_maps_t, FEATURES_SIZE)
+
+    // Split paf maps for each coordinate
+    const [B, H, W, C] = paf_maps_t.shape;
+    const true_t = tf.tensor(true, [B, H, W, Math.floor(C / 2)])
+    const false_t = tf.tensor(false, [B, H, W, Math.floor(C / 2)])
+
+    // Prepare boolean masks
+    const even_indexes_t = tf.reshape(tf.stack([true_t, false_t], -1), [B, H, W, C]);
+    const odd_indexes_t = tf.reshape(tf.stack([false_t, true_t], -1), [B, H, W, C]);
+
+    // Split x and y directions
+    const paf_x_maps_t = tf.reshape(await tf.booleanMaskAsync(paf_maps_t, even_indexes_t), [B, H, W, Math.floor(C / 2)])
+    const paf_y_maps_t = tf.reshape(await tf.booleanMaskAsync(paf_maps_t, odd_indexes_t), [B, H, W, Math.floor(C / 2)])
+
+    // Compute the norm of the paf maps vectors
+    const paf_d_maps_t = tf.sqrt(tf.add(tf.pow(paf_x_maps_t, tf.scalar(2.)), tf.pow(paf_y_maps_t, tf.scalar(2.))))
+
+    // Select indexes corresponding to relevant limbs
+    const keep_indexes_t = tf.tile(tf.reshape(tf.tensor(new Array(N_LIMBS).fill(1).map((_, i) => i).filter(i => !LIMBS_DROP_INDEXES.includes(i))), [1, 1, 1, -1]), [B, H, W, 1])
+
+    // Get the limbs features
+    const limbs_features_t = tf.sum(tf.reshape(await tf.booleanMaskAsync(paf_d_maps_t, keep_indexes_t), [B, H, W, N_RELEVANT_LIMBS]), -1, true)
+
+    // Get the joints features
+    const joints_features_t = tf.sum(tf.slice(heat_maps_t, [0, 0, 0, 0], [-1, -1, -1, N_RELEVANT_JOINTS]), -1, true)
+
+    // Get the ball features
+    const ball_features_t = tf.cast(tf.reshape((ball_mask), [B, H, W, 1]), "float32")
+
+    // Concatenate features along last dimension
+    let features_t = tf.concat([limbs_features_t, joints_features_t, ball_features_t], -1)
+
+    // Add body mask if available
+    let body_features_t
+    if (body_mask) {
+        body_features_t = tf.cast(tf.reshape((body_mask), [B, H, W, 1]), "float32")
+        features_t = tf.concat([features_t, body_features_t], -1)
+    }
+
+    return features_t;
 }
 export async function tensorToImageUrl_thomas(output_maps_t: tf.Tensor4D) {
     // # Get tensor from numpy array
@@ -144,4 +179,58 @@ export async function tensorToImageUrl(imageTensor: tf.Tensor4D):
     const jpegImageData = jpeg.encode(rawImageData, 75);
     const base64Encoding = tf.util.decodeString(jpegImageData.data, 'base64');
     return base64Encoding;
+}
+
+
+
+const dummyEllipse = { x_c: 1, y_c: 1, a: 1, b: 1 };
+const dummyResolution = [300, 500];
+const dummyU = [1, 2, 3, 4]
+
+/**
+ *  Draws the ellipse representing the tennis ball mask using only the tf library.
+    :param ball_dict: dictionary containing the coordinates of the tennis ball as returned by the "detect" function.
+    :param resolution: resolution of the input image.
+    :return: binary mask of the tennis ball.
+
+ * */
+
+export const draw_ellipse_full_tf = ({ ellipseParams = dummyEllipse, resolution = dummyResolution, U = dummyU }) => {
+
+    console.log('drawing ellipse', ellipseParams);
+    const { x_c, y_c, a, b } = dummyEllipse;
+
+    const x_c_t = tf.scalar(x_c)
+    const y_c_t = tf.scalar(y_c)
+    const a_t = tf.scalar(a)
+    const b_t = tf.scalar(b)
+
+    let x_t = tf.linspace(0., resolution[1], resolution[1] + 1);
+    let y_t = tf.linspace(0., resolution[0], resolution[0] + 1);
+
+    //# Extract orientation of the ellipse
+    const U_t = tf.tensor(U).as2D(2, 2);
+
+    //Compute angle using the fact that all norms are one and projection on e1 and   e2
+    const cos_a_t = tf.squeeze(tf.slice(U_t, [0, 0], [1, 1]));
+    const sin_a_t = tf.squeeze(tf.slice(U_t, [1, 0], [1, 1]));
+
+    x_t = tf.linspace(0., resolution[1] - 1, resolution[1])
+    y_t = tf.linspace(0., resolution[0] - 1, resolution[0])
+
+    const x_grid_t = tf.tile(tf.expandDims(x_t, 0), [resolution[0], 1])
+    const y_grid_t = tf.tile(tf.expandDims(y_t, 1), [1, resolution[1]]);
+
+
+    // Compute the distance
+    const dist_tmp1 = tf.pow(tf.div(tf.add(tf.mul(tf.sub(x_grid_t, x_c_t), cos_a_t),
+        tf.mul(tf.sub(y_grid_t, y_c_t), sin_a_t)), a_t), 2);
+    const dist_tmp2 = tf.pow(tf.div(tf.sub(tf.mul(tf.sub(x_grid_t, x_c_t), sin_a_t),
+        tf.mul(tf.sub(y_grid_t, y_c_t), cos_a_t)), b_t), 2);
+    const distance_sq_t = tf.add(dist_tmp1, dist_tmp2);
+
+    const condShape = distance_sq_t.shape as [number, number];
+    const mask_t: tf.Tensor2D = tf.where(distance_sq_t.lessEqual(tf.scalar(1.0)), tf.ones(condShape), tf.zeros(condShape));
+    return mask_t;
+
 }

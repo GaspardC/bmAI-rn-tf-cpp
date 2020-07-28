@@ -10,13 +10,13 @@
 /Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:246:27: warning: comparison of integers of different signs: 'int' and 'std::__ndk1::vector<float, std::__ndk1::allocator<float> >::size_type' (aka 'unsigned int') [-Wsign-compare]
         for (int i = 0; i < X.size(); i++)
                         ~ ^ ~~~~~~~~
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:275:42: warning: unused parameter 'mask_high' [-Wunused-parameter]
+/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:276:42: warning: unused parameter 'mask_high' [-Wunused-parameter]
                                 cv::Mat &mask_high)
                                          ^
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:296:50: warning: unused parameter 'result_image' [-Wunused-parameter]
+/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:297:50: warning: unused parameter 'result_image' [-Wunused-parameter]
     std::string save_result_image(const cv::Mat &result_image, const std::string &uri, const bool isIos)
                                                  ^
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:296:99: warning: unused parameter 'isIos' [-Wunused-parameter]
+/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:297:99: warning: unused parameter 'isIos' [-Wunused-parameter]
     std::string save_result_image(const cv::Mat &result_image, const std::string &uri, const bool isIos)
                                                                                                   ^
 7 warnings generated.

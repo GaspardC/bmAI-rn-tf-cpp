@@ -22,7 +22,7 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
 import { downloadAssetSource, getFilePath, getFileUri } from './utils/uriHelper';
-import { resizeImage, base64ImageToTensor, tensorToImageUrl_thomas } from './utils/tf_utils';
+import { resizeImage, base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse_full_tf } from './utils/tf_utils';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { Tensor4D } from '@tensorflow/tfjs';
 import { initSentry, isDev } from './utils/index';
@@ -60,6 +60,9 @@ const App = () => {
             resObj.resUri = resUri
           }
           setResJSON(resObj);
+          const ellipseParams = { x_c: resObj.x_mean, y_c: resObj.y_mean, a: resObj.a, b: resObj.b };
+          // const test = draw_ellipse_full_tf({ellipseParams});
+          console.log('ellipseParams', ellipseParams)
           resolve(resObj)
         })
         .catch((e) => {
