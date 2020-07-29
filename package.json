@@ -27,6 +27,7 @@
     "expo-image-manipulator": "^8.1.0",
     "jasmine-core": "^3.5.0",
     "jpeg-js": "^0.4.0",
+    "lodash": "^4.17.19",
     "pod-install": "^0.1.7",
     "react": "16.11.0",
     "react-native": "0.62.2",

@@ -182,10 +182,10 @@ const App = () => {
     const uriBoth = img.uri;
     console.log('img', img);
     const sourceFile = await getFilePath(imgTest)
+    const { uri: resizedUri, base64 } = await resizeImage(sourceFile, 368);
 
     // sourceFile = `file://${sourceFile}`
     // console.log('sourceFile', sourceFile);
-    const { uri: resizedUri, base64 } = await resizeImage(sourceFile, 368);
 
     run({ uri: resizedUri })
   }
