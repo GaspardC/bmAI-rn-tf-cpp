@@ -1,2 +1,1 @@
-[x86_64] Compile++      : helloworld <= hello_world_impl.cpp
-[x86_64] SharedLibrary  : libhelloworld.so
+make: Nothing to be done for 'helloworld'.

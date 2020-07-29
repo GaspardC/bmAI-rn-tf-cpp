@@ -183,9 +183,8 @@ export async function tensorToImageUrl(imageTensor: tf.Tensor4D):
 
 
 
-const dummyEllipse = { x_c: 1, y_c: 1, a: 1, b: 1 };
-const dummyResolution = [300, 500];
-const dummyU = [1, 2, 3, 4]
+const dummyResolution = [2448, 3264];
+const dummyEllipse = { x_c: 1254.9028132992328, y_c: 3054.593350383632, a: 61.2111238178404, b: 56.25621517756661, U: [[0.10865521189821306, 0.994079496281537], [0.9940794962815371, -0.10865521189821307]] }
 
 /**
  *  Draws the ellipse representing the tennis ball mask using only the tf library.
@@ -195,10 +194,10 @@ const dummyU = [1, 2, 3, 4]
 
  * */
 
-export const draw_ellipse_full_tf = ({ ellipseParams = dummyEllipse, resolution = dummyResolution, U = dummyU }) => {
+export const draw_ellipse_full_tf = ({ ellipseParams = dummyEllipse, resolution = dummyResolution }) => {
 
     console.log('drawing ellipse', ellipseParams);
-    const { x_c, y_c, a, b } = dummyEllipse;
+    const { x_c, y_c, a, b, U } = dummyEllipse;
 
     const x_c_t = tf.scalar(x_c)
     const y_c_t = tf.scalar(y_c)
@@ -209,7 +208,7 @@ export const draw_ellipse_full_tf = ({ ellipseParams = dummyEllipse, resolution 
     let y_t = tf.linspace(0., resolution[0], resolution[0] + 1);
 
     //# Extract orientation of the ellipse
-    const U_t = tf.tensor(U).as2D(2, 2);
+    const U_t = tf.tensor(U); //.as2D(2, 2);
 
     //Compute angle using the fact that all norms are one and projection on e1 and   e2
     const cos_a_t = tf.squeeze(tf.slice(U_t, [0, 0], [1, 1]));

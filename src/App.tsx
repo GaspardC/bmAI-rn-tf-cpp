@@ -59,10 +59,16 @@ const App = () => {
             const resUri = await getFileUri(resObj.resUri);
             resObj.resUri = resUri
           }
+          resObj.sU = JSON.parse(resObj.sU);
           setResJSON(resObj);
-          const ellipseParams = { x_c: resObj.x_mean, y_c: resObj.y_mean, a: resObj.a, b: resObj.b };
-          // const test = draw_ellipse_full_tf({ellipseParams});
-          console.log('ellipseParams', ellipseParams)
+          await waitForTensorFlowJs()
+          // const ellipseParams = { x_c: resObj.x_mean, y_c: resObj.y_mean, a: resObj.a, b: resObj.b };
+          //
+          const ellipseParams = { x_c: 1254.9028132992328, y_c: 3054.593350383632, a: 61.2111238178404, b: 56.25621517756661, U: [[0.10865521189821306, 0.994079496281537], [0.9940794962815371, -0.10865521189821307]] }
+          const test = draw_ellipse_full_tf({ ellipseParams, resolution: [3264, 2448] });
+          // test.print()
+          console.log(test.dataSync());
+
           resolve(resObj)
         })
         .catch((e) => {
@@ -179,7 +185,9 @@ const App = () => {
 
     // sourceFile = `file://${sourceFile}`
     // console.log('sourceFile', sourceFile);
-    run({ uri: sourceFile })
+    const { uri: resizedUri, base64 } = await resizeImage(sourceFile, 368);
+
+    run({ uri: resizedUri })
   }
 
 

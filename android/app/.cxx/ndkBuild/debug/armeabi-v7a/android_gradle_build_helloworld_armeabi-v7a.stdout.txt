@@ -1,2 +1,1 @@
-[armeabi-v7a] Compile++ thumb: helloworld <= hello_world_impl.cpp
-[armeabi-v7a] SharedLibrary  : libhelloworld.so
+make: Nothing to be done for 'helloworld'.

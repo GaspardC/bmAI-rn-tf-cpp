@@ -396,7 +396,7 @@ namespace helloworld
         // values to return
         auto value = REF_TENNIS_BALL / (2 * radius);
         vector<double> vect{x_mean, y_mean, a, b};
-        auto resStr = "{\"value\":\"" + to_string(value) + R"(", "x_mean":")" + to_string(x_mean) + R"(", "y_mean":")" + to_string(y_mean) + R"(", "a":")" + to_string(a) + R"(", "b":")" + to_string(b) + R"(", "sU":")" + sU + "\"}";
+        auto resStr = "{\"value\":\"" + to_string(value) + R"(", "x_mean":")" + to_string(x_mean + bbox_re[1]) + R"(", "y_mean":")" + to_string(y_mean + bbox_re[0]) + R"(", "a":")" + to_string(a) + R"(", "b":")" + to_string(b) + R"(", "sU":")" + sU + "\"}";
         return resStr;
     }
 
