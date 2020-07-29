@@ -64,10 +64,10 @@ const App = () => {
           await waitForTensorFlowJs()
           // const ellipseParams = { x_c: resObj.x_mean, y_c: resObj.y_mean, a: resObj.a, b: resObj.b };
           //
-          const ellipseParams = { x_c: 1254.9028132992328, y_c: 3054.593350383632, a: 61.2111238178404, b: 56.25621517756661, U: [[0.10865521189821306, 0.994079496281537], [0.9940794962815371, -0.10865521189821307]] }
-          const test = draw_ellipse_full_tf({ ellipseParams, resolution: [3264, 2448] });
+          const ellipseParams = { x_c: 124.9028132992328, y_c: 304.593350383632, a: 6.2111238178404, b: 5.25621517756661, U: [[0.10865521189821306, 0.994079496281537], [0.9940794962815371, -0.10865521189821307]] }
+          const test = await draw_ellipse_full_tf({ ellipseParams, resolution: [326, 244] });
           // test.print()
-          console.log(test.dataSync());
+          // console.log(test.dataSync());
 
           resolve(resObj)
         })

@@ -107,37 +107,50 @@ export async function build_features_full_tf(heat_maps_t: tf.Tensor4D, paf_maps_
 
     return features_t;
 }
+
+export const tensorToImage64 = async (channel_t: tf.Tensor) => {
+    // # Get rid of extra dimensions
+    const [H, W] = channel_t.shape
+
+    // # Rescale in range 0 - 255
+    const min_value_t = tf.min(channel_t)
+    const max_value_t = tf.max(channel_t)
+    console.log(`channel_t_.shape ${channel_t.shape}`)
+    console.log(`min_value_t ${min_value_t}`)
+    console.log(`max_value_t ${max_value_t}`)
+
+    const channel_t_squeeze_ = tf.mul(tf.div(tf.sub(channel_t, min_value_t), tf.sub(max_value_t, min_value_t)), tf.scalar(255.))
+    // console.log(channel_t_squeeze_.shape)
+
+    // # Cast to int
+    const channel_t_squeeze_int = tf.cast(channel_t_squeeze_, "int32")
+
+
+    // # Repeat the tensor along channel dimension
+    const channel_t_ = tf.stack([channel_t_squeeze_int, channel_t_squeeze_int, channel_t_squeeze_int], 2)
+
+    // # Add alpha channel
+    const alpha_channel_t = tf.mul(tf.ones([H, W]), 255)
+
+    // # Stack alpha channel
+    const res = tf.concat([channel_t_, tf.expandDims(alpha_channel_t, 2)], 2)
+    console.log(res.shape)
+
+    return await toBase64(res, W, H);
+}
 export async function tensorToImageUrl_thomas(output_maps_t: tf.Tensor4D) {
     // # Get tensor from numpy array
     // const output_maps_t = tf.compat.v1.convert_to_tensor(output_maps)
 
     // # Select a single channel
     const channel_t = tf.slice(output_maps_t, [0, 0, 0, 18], [1, -1, -1, 1])
-
-    // # Get rid of extra dimensions
     const channel_t_squeeze = tf.squeeze(channel_t)
-    const [B, H, W] = channel_t.shape
 
-    // # Rescale in range 0 - 255
-    const min_value_t = tf.min(channel_t)
-    const max_value_t = tf.max(channel_t)
-    const channel_t_squeeze_ = tf.mul(tf.div(tf.sub(channel_t_squeeze, min_value_t), tf.sub(max_value_t, min_value_t)), tf.scalar(255.))
-    console.log(channel_t_squeeze_.shape)
+    return await tensorToImage64(channel_t_squeeze)
+}
 
-    // # Cast to int
-    const channel_t_squeeze_int = tf.cast(channel_t_squeeze_, "int32")
-
-    // # Repeat the tensor along channel dimension
-    const channel_t_ = tf.stack([channel_t_squeeze_int, channel_t_squeeze_int, channel_t_squeeze_int], 2)
-    console.log(`channel_t_.shape ${channel_t_.shape}`)
-
-    // # Add alpha channel
-    const alpha_channel_t = tf.mul(tf.ones([H, W]), 255)
-    // # Stack alpha channel
-    const res = tf.concat([channel_t_, tf.expandDims(alpha_channel_t, 2)], 2)
-    console.log(res.shape)
-
-    const res_flatten = tf.reshape(res, [-1]);
+const toBase64 = async (tensor, W, H) => {
+    const res_flatten = tf.reshape(tensor, [-1]);
     const data = await res_flatten.data();
 
     const rawImageData = {
@@ -184,7 +197,7 @@ export async function tensorToImageUrl(imageTensor: tf.Tensor4D):
 
 
 const dummyResolution = [2448, 3264];
-const dummyEllipse = { x_c: 1254.9028132992328, y_c: 3054.593350383632, a: 61.2111238178404, b: 56.25621517756661, U: [[0.10865521189821306, 0.994079496281537], [0.9940794962815371, -0.10865521189821307]] }
+const dummyEllipse = { x_mean: 1254.9028132992328, y_mean: 3054.593350383632, a: 61.2111238178404, b: 56.25621517756661, sU: [0.10865521189821306, 0.994079496281537, 0.9940794962815371, -0.10865521189821307] }
 
 /**
  *  Draws the ellipse representing the tennis ball mask using only the tf library.
@@ -194,11 +207,10 @@ const dummyEllipse = { x_c: 1254.9028132992328, y_c: 3054.593350383632, a: 61.21
 
  * */
 
-export const draw_ellipse_full_tf = ({ ellipseParams = dummyEllipse, resolution = dummyResolution }) => {
+export const draw_ellipse_full_tf = async ({ ellipseParams, resolution }) => {
 
-    console.log('drawing ellipse', ellipseParams);
-    const { x_c, y_c, a, b, U } = dummyEllipse;
-
+    const { x_mean: x_c, y_mean: y_c, a, b, sU: U } = ellipseParams;
+    console.log('x_c, y_c, a, b, U', x_c, y_c, a, b, U)
     const x_c_t = tf.scalar(x_c)
     const y_c_t = tf.scalar(y_c)
     const a_t = tf.scalar(a)
@@ -208,7 +220,10 @@ export const draw_ellipse_full_tf = ({ ellipseParams = dummyEllipse, resolution 
     let y_t = tf.linspace(0., resolution[0], resolution[0] + 1);
 
     //# Extract orientation of the ellipse
-    const U_t = tf.tensor(U); //.as2D(2, 2);
+    // const U_t = tf.tensor(U); //.as2D(2, 2);
+    const U_t = tf.tensor(U).as2D(2, 2);
+
+    console.log('U_t', U_t)
 
     //Compute angle using the fact that all norms are one and projection on e1 and   e2
     const cos_a_t = tf.squeeze(tf.slice(U_t, [0, 0], [1, 1]));
@@ -230,6 +245,8 @@ export const draw_ellipse_full_tf = ({ ellipseParams = dummyEllipse, resolution 
 
     const condShape = distance_sq_t.shape as [number, number];
     const mask_t: tf.Tensor2D = tf.where(distance_sq_t.lessEqual(tf.scalar(1.0)), tf.ones(condShape), tf.zeros(condShape));
-    return mask_t;
+    console.log(` mask_t min_value_t ${tf.min(mask_t)}`)
+    console.log(` mask_t max_value_t ${tf.max(mask_t)}`)
+    return await tensorToImage64(mask_t);
 
 }

@@ -6,7 +6,7 @@
 // 4. full tf
 // chose photo: chose another photo or reset
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Div, Image, Text, Button } from 'react-native-magnus';
 import { isIos } from './utils';
 import { isEmpty } from 'lodash'
@@ -30,7 +30,7 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
 import { downloadAssetSource, getFilePath, getFileUri } from './utils/uriHelper';
-import { resizeImage, base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse_full_tf } from './utils/tf_utils';
+import { base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse_full_tf, resizeImage } from './utils/tf_utils';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { Tensor4D } from '@tensorflow/tfjs';
 import { initSentry, isDev } from './utils/index';
@@ -45,10 +45,15 @@ const Home = () => {
     const [isLoading, setLoading] = useState(false)
     const [isTfReady, setTfReady] = useState(false);
     const [resTf, setResTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ loading: false, error: '', uri: '' })
+    const [ellipseTf, setEllipseTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ uri: '' })
+
+    useEffect(() => {
+        getImageSource(imageSource).then(res => setImageSrouce(res))
+    }, [])
 
     const openPicker = () => {
         const options = { noData: true };
-        ImagePicker.showImagePicker(options, (response) => {
+        ImagePicker.showImagePicker(options, async (response) => {
             console.log('Response = ', response);
             if (response.didCancel) {
                 console.log('User cancelled image picker');
@@ -57,14 +62,18 @@ const Home = () => {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
+                const image = await resizeImage(response.path, 368);
+
                 const source = {
-                    uri: response.uri,
+                    path: response.path,
+                    ...image,
                     uriBoth: isIos() ? response.uri : 'file://' + response.path,
                 };
 
+
                 // You can also display the image using data:
                 // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-                console.log(source);
+                // console.log(source);
                 setImageSrouce(source)
                 // run(source)
             }
@@ -123,7 +132,6 @@ const Home = () => {
         return new Promise((resolve, reject) => {
             CppDetectTennisBall.sayHello(uriBoth)
                 .then(async (res) => {
-                    console.log('res', res);
                     let resObj = JSON.parse(res);
                     if (isIos()) {
                         // resObj.resUri = resObj?.resUri?.replace('file://', '')
@@ -131,6 +139,12 @@ const Home = () => {
                         const resUri = await getFileUri(resObj.resUri);
                         resObj.resUri = resUri
                     }
+                    Object.entries(resObj).forEach(([key, value]: [string, string]) => {
+                        if (key === 'sU') return;
+                        resObj[key] = parseFloat(value);
+                    })
+                    console.log('res parsed', resObj);
+
                     resObj.sU = JSON.parse(resObj.sU);
                     setTennisBallRes(prev => ({ ...prev, loading: false, res: resObj }));
                     resolve(resObj)
@@ -143,22 +157,60 @@ const Home = () => {
         })
     };
 
+    const getEllipse = async () => {
+        // const ellipseParams = { x_c: 125, y_c: 305, a: 6, b: 5, U: [[0.10865521189821306, 0.994079496281537], [0.9940794962815371, -0.10865521189821307]] }
+        // const ellipseBase64 = await draw_ellipse_full_tf({ ellipseParams, resolution: [326, 244] });
+        try {
+            const ellipseParams = tennisBallRes.res
+            setEllipseTf(({ loading: true }))
+
+            const ellipseBase64 = await draw_ellipse_full_tf({ ellipseParams, resolution: [imageSource.height, imageSource.width] });
+            setEllipseTf(prev => ({ ...prev, uri: `data:image/jpeg;base64,${ellipseBase64}` }))
+        } catch (e) {
+            setEllipseTf(prev => ({ ...prev, error: e }))
+        }
+        finally {
+            setEllipseTf(prev => ({ ...prev, loading: false }))
+        }
+    }
+
     const run = async () => {
-        const imageUri = await getImageSourceUri(imageSource)
+        if (!isTfReady) {
+            await waitForTensorFlowJs()
+        }
+        const { uri: imageUri } = await getImageSource(imageSource)
         await processCppImg(imageUri)
-        processTFImg(imageUri);
+    }
+
+    useEffect(() => {
+        if (isEmpty(tennisBallRes.res)) return;
+        getEllipse()
+    }, [tennisBallRes])
+
+    useEffect(() => {
+        if (isEmpty(tennisBallRes.res)) return;
+        getImageSource(imageSource).then(({ uri }) => {
+            processTFImg(uri);
+        })
+    }, [tennisBallRes])
+
+    const resetToDefault = () => {
+        getImageSource(imageSource).then(res => setImageSrouce(res))
+        setEllipseTf({ loading: false })
+        setResTf({ loading: false })
+        setTennisBallRes({ loading: false })
     }
 
     return <ScrollView style={styles.scrollView}>
         <Div p={'lg'}>
             <Div>
-                <TextInstruction>1. Chose an image :</TextInstruction>
+                <TextInstruction>1. Chose a photo :</TextInstruction>
                 <DivRow>
                     <Image source={imageSource.uri ? { uri: imageSource.uri } : imageSource} h={200} w={200} resizeMode="contain"></Image>
                 </DivRow>
                 <DivRow justifyContent="space-around">
                     <Button onPress={openPicker} bg="white" borderWidth={1} borderColor="blue500" color="blue500" underlayColor="blue100">Chose another one</Button>
-                    <Button onPress={() => { setImageSrouce(imageDefault) }} bg="white" borderWidth={1} borderColor="red500" color="red500" underlayColor="red100">Reset to default</Button>
+                    <Button onPress={resetToDefault} bg="white" borderWidth={1} borderColor="red500" color="red500" underlayColor="red100">Reset to default</Button>
                 </DivRow>
                 <TextInstruction>2. Run the algorithm:</TextInstruction>
 
@@ -175,6 +227,13 @@ const Home = () => {
                     </>}
                 </DivRow>
                 <TextInstruction>4. Ellipse mask tennis ball</TextInstruction>
+                <DivRow>
+                    {ellipseTf.loading && <ActivityIndicator />}
+                    {!ellipseTf.loading && <>
+                        {!isEmpty(ellipseTf.error) && <Text>{ellipseTf.error}</Text>}
+                        {!isEmpty(ellipseTf.uri) && <Image source={{ uri: ellipseTf.uri }} h={200} w={200} resizeMode="contain" />}
+                    </>}
+                </DivRow>
                 <TextInstruction>5. Skeletton</TextInstruction>
                 <DivRow>
                     {resTf.loading && <ActivityIndicator />}
@@ -202,9 +261,8 @@ const DivRow = ({ children, ...otherProps }) => <Div row justifyContent="center"
 const TextInstruction = ({ children }) => <Text fontWeight="bold" fontSize="cl">{children}</Text>
 
 
-const getImageSourceUri = async (imageSource) => {
-    if (imageSource.uri) return imageSource.uri;
+const getImageSource = async (imageSource) => {
+    if (imageSource.uri) return imageSource;
     const sourceFile = await getFilePath(imageDefault)
-    const { uri, base64 } = await resizeImage(sourceFile, 368);
-    return uri;
+    return await resizeImage(sourceFile, 368);
 }
