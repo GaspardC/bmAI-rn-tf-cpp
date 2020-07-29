@@ -34,20 +34,17 @@ import { resizeImage, base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { Tensor4D } from '@tensorflow/tfjs';
 import { initSentry, isDev } from './utils/index';
-const imgTest = require('./assets/images/ball2.jpg');
 
 const imageDefault = require('./assets/images/ball2.jpg');
 
+const { HelloWorld: CppDetectTennisBall } = NativeModules;
+
 const Home = () => {
     const [imageSource, setImageSrouce] = useState(imageDefault)
-    const [isModeTf, setModeTf] = useState(false)
+    const [tennisBallRes, setTennisBallRes] = useState<{ res?: any; loading?: boolean; error?: string }>({ res: {}, loading: false, error: '' })
     const [isLoading, setLoading] = useState(false)
     const [isTfReady, setTfReady] = useState(false);
-    const [resTf, setResTf] = useState<{
-        loading?: boolean;
-        error?: any;
-        uri?: string;
-    }>({ loading: false, error: null, uri: '' })
+    const [resTf, setResTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ loading: false, error: '', uri: '' })
 
     const openPicker = () => {
         const options = { noData: true };
@@ -119,11 +116,36 @@ const Home = () => {
         finally {
             setResTf(prev => ({ ...prev, loading: false }))
         }
-
     }
+
+    const processCppImg = (uriBoth) => {
+        setTennisBallRes({ loading: true });
+        return new Promise((resolve, reject) => {
+            CppDetectTennisBall.sayHello(uriBoth)
+                .then(async (res) => {
+                    console.log('res', res);
+                    let resObj = JSON.parse(res);
+                    if (isIos()) {
+                        // resObj.resUri = resObj?.resUri?.replace('file://', '')
+                        // resObj.resSource = uriBoth;
+                        const resUri = await getFileUri(resObj.resUri);
+                        resObj.resUri = resUri
+                    }
+                    resObj.sU = JSON.parse(resObj.sU);
+                    setTennisBallRes(prev => ({ ...prev, loading: false, res: resObj }));
+                    resolve(resObj)
+                })
+                .catch((e) => {
+                    console.log(e);
+                    setTennisBallRes(prev => ({ ...prev, loading: false, error: e }));
+                    reject(e)
+                });
+        })
+    };
 
     const run = async () => {
         const imageUri = await getImageSourceUri(imageSource)
+        await processCppImg(imageUri)
         processTFImg(imageUri);
     }
 
@@ -145,6 +167,13 @@ const Home = () => {
 
                 </DivRow>
                 <TextInstruction>3. Tennis ball detection</TextInstruction>
+                <DivRow>
+                    {tennisBallRes.loading && <ActivityIndicator />}
+                    {!tennisBallRes.loading && <>
+                        {!isEmpty(tennisBallRes.error) && <Text>{tennisBallRes.error}</Text>}
+                        {!isEmpty(tennisBallRes.res) && <Text>{JSON.stringify(tennisBallRes.res)}</Text>}
+                    </>}
+                </DivRow>
                 <TextInstruction>4. Ellipse mask tennis ball</TextInstruction>
                 <TextInstruction>5. Skeletton</TextInstruction>
                 <DivRow>
@@ -175,7 +204,7 @@ const TextInstruction = ({ children }) => <Text fontWeight="bold" fontSize="cl">
 
 const getImageSourceUri = async (imageSource) => {
     if (imageSource.uri) return imageSource.uri;
-    const sourceFile = await getFilePath(imgTest)
+    const sourceFile = await getFilePath(imageDefault)
     const { uri, base64 } = await resizeImage(sourceFile, 368);
     return uri;
 }
