@@ -39,6 +39,8 @@ const imageDefault = require('./assets/images/ball2.jpg');
 
 const { HelloWorld: CppDetectTennisBall } = NativeModules;
 
+const RESIZE_HEIGHT = 600;
+
 const Home = () => {
     const [imageSource, setImageSrouce] = useState(imageDefault)
     const [tennisBallRes, setTennisBallRes] = useState<{ res?: any; loading?: boolean; error?: string }>({ res: {}, loading: false, error: '' })
@@ -52,7 +54,8 @@ const Home = () => {
     }, [])
 
     const openPicker = () => {
-        const options = { noData: true };
+        resetToDefault({})
+        const options = { noData: true, maxHeight: RESIZE_HEIGHT };
         ImagePicker.showImagePicker(options, async (response) => {
             console.log('Response = ', response);
             if (response.didCancel) {
@@ -62,8 +65,7 @@ const Home = () => {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
-                const image = await resizeImage(response.path, 368);
-
+                const image = await resizeImage(response.path, RESIZE_HEIGHT);
                 const source = {
                     path: response.path,
                     ...image,
@@ -102,7 +104,7 @@ const Home = () => {
 
             console.log(`loading model in ${Date.now() - startTimeModel}`);
 
-            const { uri: resizedUri, base64 } = await resizeImage(uri, 368);
+            const { uri: resizedUri, base64 } = await resizeImage(uri, RESIZE_HEIGHT);
 
             const inputMat = await base64ImageToTensor(base64);
             const startTime = Date.now();
@@ -175,11 +177,15 @@ const Home = () => {
     }
 
     const run = async () => {
+        resetToDefault({ resetImage: false })
         if (!isTfReady) {
             await waitForTensorFlowJs()
         }
-        const { uri: imageUri } = await getImageSource(imageSource)
-        await processCppImg(imageUri)
+        const image = await getImageSource(imageSource)
+        const img2log = { ...image };
+        delete img2log['base64']
+        console.log('run on image', img2log)
+        await processCppImg(image.uri)
     }
 
     useEffect(() => {
@@ -194,8 +200,8 @@ const Home = () => {
         })
     }, [tennisBallRes])
 
-    const resetToDefault = () => {
-        getImageSource(imageSource).then(res => setImageSrouce(res))
+    const resetToDefault = ({ resetImage = true }: { resetImage?: boolean }) => {
+        if (resetImage) getImageSource(imageDefault).then(res => setImageSrouce(res))
         setEllipseTf({ loading: false })
         setResTf({ loading: false })
         setTennisBallRes({ loading: false })
@@ -206,7 +212,7 @@ const Home = () => {
             <Div>
                 <TextInstruction>1. Chose a photo :</TextInstruction>
                 <DivRow>
-                    <Image source={imageSource.uri ? { uri: imageSource.uri } : imageSource} h={200} w={200} resizeMode="contain"></Image>
+                    <Image source={{ uri: imageSource.uri }} h={200} w={200} resizeMode="contain"></Image>
                 </DivRow>
                 <DivRow justifyContent="space-around">
                     <Button onPress={openPicker} bg="white" borderWidth={1} borderColor="blue500" color="blue500" underlayColor="blue100">Chose another one</Button>
@@ -264,5 +270,5 @@ const TextInstruction = ({ children }) => <Text fontWeight="bold" fontSize="cl">
 const getImageSource = async (imageSource) => {
     if (imageSource.uri) return imageSource;
     const sourceFile = await getFilePath(imageDefault)
-    return await resizeImage(sourceFile, 368);
+    return await resizeImage(sourceFile, RESIZE_HEIGHT);
 }

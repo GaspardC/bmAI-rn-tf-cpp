@@ -15,10 +15,10 @@ export function toDataUri(base64: string): string {
     return `data:image/jpeg;base64,${base64}`;
 }
 export async function resizeImage(
-    imageUrl: string, width: number): Promise<ImageManipulator.ImageResult> {
+    imageUrl: string, height: number): Promise<ImageManipulator.ImageResult> {
     const actions = [{
         resize: {
-            width,
+            height,
         },
     }];
     const saveOptions = {
@@ -116,8 +116,6 @@ export const tensorToImage64 = async (channel_t: tf.Tensor) => {
     const min_value_t = tf.min(channel_t)
     const max_value_t = tf.max(channel_t)
     console.log(`channel_t_.shape ${channel_t.shape}`)
-    console.log(`min_value_t ${min_value_t}`)
-    console.log(`max_value_t ${max_value_t}`)
 
     const channel_t_squeeze_ = tf.mul(tf.div(tf.sub(channel_t, min_value_t), tf.sub(max_value_t, min_value_t)), tf.scalar(255.))
     // console.log(channel_t_squeeze_.shape)
@@ -210,7 +208,7 @@ const dummyEllipse = { x_mean: 1254.9028132992328, y_mean: 3054.593350383632, a:
 export const draw_ellipse_full_tf = async ({ ellipseParams, resolution }) => {
 
     const { x_mean: x_c, y_mean: y_c, a, b, sU: U } = ellipseParams;
-    console.log('x_c, y_c, a, b, U', x_c, y_c, a, b, U)
+    console.log('x_c, y_c, a, b, U, resolution', x_c, y_c, a, b, U, resolution)
     const x_c_t = tf.scalar(x_c)
     const y_c_t = tf.scalar(y_c)
     const a_t = tf.scalar(a)
