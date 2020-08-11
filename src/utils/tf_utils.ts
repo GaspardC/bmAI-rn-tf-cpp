@@ -201,7 +201,7 @@ export async function tensorToImageUrl(imageTensor: tf.Tensor4D):
 
 const dummyResolution = [2448, 3264];
 const dummyEllipse = { x_mean: 1254.9028132992328, y_mean: 3054.593350383632, a: 61.2111238178404, b: 56.25621517756661, sU: [0.10865521189821306, 0.994079496281537, 0.9940794962815371, -0.10865521189821307] }
-
+export type EllipseType = Partial<typeof dummyEllipse>
 /**
  *  Draws the ellipse representing the tennis ball mask using only the tf library.
     :param ball_dict: dictionary containing the coordinates of the tennis ball as returned by the "detect" function.

@@ -30,24 +30,24 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
 import { downloadAssetSource, getFilePath, getFileUri } from './utils/uriHelper';
-import { base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse_full_tf, resizeImage } from './utils/tf_utils';
+import { base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse_full_tf, resizeImage, EllipseType } from './utils/tf_utils';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { Tensor4D } from '@tensorflow/tfjs';
 import { initSentry, isDev } from './utils/index';
 
 const imageDefault = require('./assets/images/ball.jpg');
+let model;
 
 const { HelloWorld: CppDetectTennisBall } = NativeModules;
 
-const RESIZE_HEIGHT = 1200;
+const RESIZE_HEIGHT = 700;
 
 const Home = () => {
     const [imageSource, setImageSrouce] = useState(imageDefault)
-    const [tennisBallRes, setTennisBallRes] = useState<{ res?: any; loading?: boolean; error?: string }>({ res: {}, loading: false, error: '' })
-    const [isLoading, setLoading] = useState(false)
+    const [tennisBallRes, setTennisBallRes] = useState<{ res?: EllipseType; loading?: boolean; error?: string }>({ res: {}, loading: false, error: '' })
     const [isTfReady, setTfReady] = useState(false);
     const [resTf, setResTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ loading: false, error: '', uri: '' })
-    const [ellipseTf, setEllipseTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ uri: '' })
+    const [ellipseTf, setEllipseTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ loading: false, error: '', uri: '' })
 
     useEffect(() => {
         const todel = { ...imageSource }
@@ -61,7 +61,7 @@ const Home = () => {
 
     const openPicker = () => {
         resetToDefault({})
-        const options = { noData: true, maxHeight: RESIZE_HEIGHT };
+        const options = { noData: true, maxHeight: RESIZE_HEIGHT, maxWidth: RESIZE_HEIGHT };
         ImagePicker.showImagePicker(options, async (response) => {
             console.log('Response = ', response);
             if (response.didCancel) {
@@ -82,7 +82,7 @@ const Home = () => {
 
                 // You can also display the image using data:
                 // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-                // console.log('source is ', source);
+                console.log('source is ', source);
                 setImageSrouce(source)
                 // run(source)
             }
@@ -90,26 +90,31 @@ const Home = () => {
     };
 
     async function waitForTensorFlowJs() {
+
         await tf.ready();
+
+
+        const modelJson = require('./assets/model/frozen/model.json');
+        const modelWeights = require('./assets/model/frozen/group1-shard1of1.bin');
+
+        const startTimeModel = Date.now();
+        model = await tf.loadGraphModel(
+            bundleResourceIO(modelJson, modelWeights),
+        );
+
+        console.log(`loading model in ${Date.now() - startTimeModel}`);
         setTfReady(true);
+        return model;
+
     }
 
     const processTFImg = async (uri: string) => {
         try {
             setResTf({ loading: true })
-            if (!isTfReady) {
+            if (!isTfReady || !model) {
                 await waitForTensorFlowJs()
             }
 
-            const modelJson = require('./assets/model/frozen/model.json');
-            const modelWeights = require('./assets/model/frozen/group1-shard1of1.bin');
-
-            const startTimeModel = Date.now();
-            const model = await tf.loadGraphModel(
-                bundleResourceIO(modelJson, modelWeights),
-            );
-
-            console.log(`loading model in ${Date.now() - startTimeModel}`);
 
             const { uri: resizedUri, base64 } = await resizeImage(uri, RESIZE_HEIGHT);
 
@@ -125,7 +130,7 @@ const Home = () => {
             const imageUrl = await tensorToImageUrl_thomas(res);
             // console.log(`tfcode ${Date.now() - startTimeTfCode}`);
             setResTf(prev => ({ ...prev, uri: `data:image/jpeg;base64,${imageUrl}` }))
-            console.log(`imageUrl ${imageUrl}`);
+            // console.log(`imageUrl ${imageUrl}`);
         } catch (err) {
             setResTf(prev => ({ ...prev, error: err ?? 'error model' }))
             console.log('erreur model !');
@@ -133,6 +138,7 @@ const Home = () => {
         }
         finally {
             setResTf(prev => ({ ...prev, loading: false }))
+            tf.disposeVariables()
         }
     }
 
@@ -141,20 +147,25 @@ const Home = () => {
         return new Promise((resolve, reject) => {
             CppDetectTennisBall.sayHello(uriBoth)
                 .then(async (res) => {
-                    let resObj = JSON.parse(res);
+                    const resJSON = JSON.parse(res);
                     // if (isIos()) {
                     //     // resObj.resUri = resObj?.resUri?.replace('file://', '')
                     //     // resObj.resSource = uriBoth;
                     //     const resUri = await getFileUri(resObj.resUri);
                     //     resObj.resUri = resUri
                     // }
-                    Object.entries(resObj).forEach(([key, value]: [string, string]) => {
+                    const resObj: EllipseType = {}
+                    Object.entries(resJSON).forEach(([key, value]: [string, string]) => {
                         if (key === 'sU') return;
                         resObj[key] = parseFloat(value);
                     })
                     console.log('res parsed', resObj);
-
-                    resObj.sU = JSON.parse(resObj.sU);
+                    //@ts-ignore
+                    resObj.sU = JSON.parse(resJSON.sU);
+                    if (resObj.x_mean === -1) {
+                        //@ts-ignore
+                        alert('no ellipse found')
+                    }
                     setTennisBallRes(prev => ({ ...prev, loading: false, res: resObj }));
                     resolve(resObj)
                 })
@@ -170,9 +181,11 @@ const Home = () => {
         // const ellipseParams = { x_c: 125, y_c: 305, a: 6, b: 5, U: [[0.10865521189821306, 0.994079496281537], [0.9940794962815371, -0.10865521189821307]] }
         // const ellipseBase64 = await draw_ellipse_full_tf({ ellipseParams, resolution: [326, 244] });
         try {
+            if (tennisBallRes.res?.a === -1) {
+                return;
+            }
             const ellipseParams = tennisBallRes.res
-            setEllipseTf(({ loading: true }))
-
+            setEllipseTf(prev => ({ ...prev, loading: true }))
             const ellipseBase64 = await draw_ellipse_full_tf({ ellipseParams, resolution: [imageSource.height, imageSource.width] });
             setEllipseTf(prev => ({ ...prev, uri: `data:image/jpeg;base64,${ellipseBase64}` }))
         } catch (e) {
@@ -184,6 +197,10 @@ const Home = () => {
     }
 
     const run = async () => {
+        if (isRunning()) {
+            //@ts-ignore
+            return alert('algorithm running wait before re-running it')
+        }
         resetToDefault({ resetImage: false })
         if (!isTfReady) {
             await waitForTensorFlowJs()
@@ -198,14 +215,14 @@ const Home = () => {
     useEffect(() => {
         if (isEmpty(tennisBallRes.res)) return;
         getEllipse()
-    }, [tennisBallRes])
+    }, [tennisBallRes.res])
 
     useEffect(() => {
         if (isEmpty(tennisBallRes.res)) return;
         getImageSource(imageSource).then(({ uri }) => {
             processTFImg(uri);
         })
-    }, [tennisBallRes])
+    }, [tennisBallRes.res])
 
     const resetToDefault = ({ resetImage = true }: { resetImage?: boolean }) => {
         if (resetImage) getImageSource(imageDefault).then(res => setImageSrouce(res))
@@ -213,6 +230,8 @@ const Home = () => {
         setResTf({ loading: false })
         setTennisBallRes({ loading: false })
     }
+
+    const isRunning = () => ellipseTf.loading || resTf.loading || tennisBallRes.loading
 
     return <ScrollView style={styles.scrollView}>
         <SafeAreaView>
@@ -235,18 +254,21 @@ const Home = () => {
                     <TextInstruction>3. Tennis ball detection</TextInstruction>
                     <DivRow>
                         {tennisBallRes.loading && <ActivityIndicator />}
-                        {!tennisBallRes.loading && <>
+                        {!tennisBallRes.loading && tennisBallRes.res?.a !== -1 && <>
                             {!isEmpty(tennisBallRes.error) && <Text>{tennisBallRes.error}</Text>}
                             {!isEmpty(tennisBallRes.res) && <Text>{JSON.stringify(tennisBallRes.res)}</Text>}
                         </>}
+                        {tennisBallRes.res?.a === -1 && <Text>No tennis ball found</Text>}
+
                     </DivRow>
                     <TextInstruction>4. Ellipse mask tennis ball</TextInstruction>
                     <DivRow>
                         {ellipseTf.loading && <ActivityIndicator />}
-                        {!ellipseTf.loading && <>
+                        {!ellipseTf.loading && tennisBallRes.res?.a !== -1 && <>
                             {!isEmpty(ellipseTf.error) && <Text>{ellipseTf.error}</Text>}
                             {!isEmpty(ellipseTf.uri) && <Image {...{ source: { uri: ellipseTf.uri }, resizeMode: 'contain' }} h={200} w={200} />}
                         </>}
+                        {tennisBallRes.res?.a === -1 && <Text>No tennis ball found</Text>}
                     </DivRow>
                     <TextInstruction>5. Skeletton</TextInstruction>
                     <DivRow>

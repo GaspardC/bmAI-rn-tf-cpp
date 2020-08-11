@@ -234,6 +234,12 @@ namespace helloworld
         vector<cv::Point> locations; // output, locations of non-zero pixels
         cv::findNonZero(edge, locations);
 
+        if (locations.empty())
+        {
+            // std::cout << "No ellipse found = ";
+            return std::make_tuple(-1.0, -1.0, -1.0, -1.0, edge);
+        }
+
         vector<float> X(locations.size());
         vector<float> Y(locations.size());
 
