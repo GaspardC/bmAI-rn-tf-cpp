@@ -19,7 +19,7 @@ function getFilename(source_uri) {
         }
 
     } catch (e) {
-        console.log()
+        console.log(e)
     }
 
 }

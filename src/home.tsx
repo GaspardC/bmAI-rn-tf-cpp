@@ -35,11 +35,11 @@ import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { Tensor4D } from '@tensorflow/tfjs';
 import { initSentry, isDev } from './utils/index';
 
-const imageDefault = require('./assets/images/ball2.jpg');
+const imageDefault = require('./assets/images/ball.jpg');
 
 const { HelloWorld: CppDetectTennisBall } = NativeModules;
 
-const RESIZE_HEIGHT = 600;
+const RESIZE_HEIGHT = 1200;
 
 const Home = () => {
     const [imageSource, setImageSrouce] = useState(imageDefault)
@@ -49,6 +49,12 @@ const Home = () => {
     const [resTf, setResTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ loading: false, error: '', uri: '' })
     const [ellipseTf, setEllipseTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ uri: '' })
 
+    useEffect(() => {
+        const todel = { ...imageSource }
+        delete todel['base64']
+
+        console.log('imageSource', todel)
+    }, [imageSource])
     useEffect(() => {
         getImageSource(imageSource).then(res => setImageSrouce(res))
     }, [])
@@ -65,17 +71,18 @@ const Home = () => {
             } else if (response.customButton) {
                 console.log('User tapped custom button: ', response.customButton);
             } else {
-                const image = await resizeImage(response.path, RESIZE_HEIGHT);
+                // console.log('response is ', response);
+                const image = await resizeImage(response.uri, RESIZE_HEIGHT);
                 const source = {
-                    path: response.path,
+                    path: isIos() ? image.uri : response.path,
                     ...image,
-                    uriBoth: isIos() ? response.uri : 'file://' + response.path,
+                    uriBoth: isIos() ? image.uri : 'file://' + response.path,
                 };
 
 
                 // You can also display the image using data:
                 // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-                // console.log(source);
+                // console.log('source is ', source);
                 setImageSrouce(source)
                 // run(source)
             }
@@ -135,12 +142,12 @@ const Home = () => {
             CppDetectTennisBall.sayHello(uriBoth)
                 .then(async (res) => {
                     let resObj = JSON.parse(res);
-                    if (isIos()) {
-                        // resObj.resUri = resObj?.resUri?.replace('file://', '')
-                        // resObj.resSource = uriBoth;
-                        const resUri = await getFileUri(resObj.resUri);
-                        resObj.resUri = resUri
-                    }
+                    // if (isIos()) {
+                    //     // resObj.resUri = resObj?.resUri?.replace('file://', '')
+                    //     // resObj.resSource = uriBoth;
+                    //     const resUri = await getFileUri(resObj.resUri);
+                    //     resObj.resUri = resUri
+                    // }
                     Object.entries(resObj).forEach(([key, value]: [string, string]) => {
                         if (key === 'sU') return;
                         resObj[key] = parseFloat(value);
@@ -208,51 +215,53 @@ const Home = () => {
     }
 
     return <ScrollView style={styles.scrollView}>
-        <Div p={'lg'}>
-            <Div>
-                <TextInstruction>1. Chose a photo :</TextInstruction>
-                <DivRow>
-                    <Image source={{ uri: imageSource.uri }} h={200} w={200} resizeMode="contain"></Image>
-                </DivRow>
-                <DivRow justifyContent="space-around">
-                    <Button onPress={openPicker} bg="white" borderWidth={1} borderColor="blue500" color="blue500" underlayColor="blue100">Chose another one</Button>
-                    <Button onPress={resetToDefault} bg="white" borderWidth={1} borderColor="red500" color="red500" underlayColor="red100">Reset to default</Button>
-                </DivRow>
-                <TextInstruction>2. Run the algorithm:</TextInstruction>
+        <SafeAreaView>
+            <Div p={'lg'}>
+                <Div>
+                    <TextInstruction>1. Chose a photo :</TextInstruction>
+                    <DivRow>
+                        <Image {...{ source: { uri: imageSource.uri }, resizeMode: 'contain' }} h={200} w={200}></Image>
+                    </DivRow>
+                    <DivRow justifyContent="space-around">
+                        <Button {...{ onPress: openPicker, underlayColor: 'blue100' }} bg="white" borderWidth={1} borderColor="blue500" color="blue500">Chose another one</Button>
+                        <Button {...{ onPress: resetToDefault, underlayColor: 'red100' }} bg="white" borderWidth={1} borderColor="red500" color="red500" >Reset to default</Button>
+                    </DivRow>
+                    <TextInstruction>2. Run the algorithm:</TextInstruction>
 
-                <DivRow justifyContent="space-around">
-                    <Button onPress={run} bg="white" borderWidth={1} borderColor="green500" color="green500" underlayColor="green500">Run</Button>
+                    <DivRow justifyContent="space-around">
+                        <Button {...{ onPress: run, underlayColor: 'green500' }} bg="white" borderWidth={1} borderColor="green500" color="green500">Run</Button>
 
-                </DivRow>
-                <TextInstruction>3. Tennis ball detection</TextInstruction>
-                <DivRow>
-                    {tennisBallRes.loading && <ActivityIndicator />}
-                    {!tennisBallRes.loading && <>
-                        {!isEmpty(tennisBallRes.error) && <Text>{tennisBallRes.error}</Text>}
-                        {!isEmpty(tennisBallRes.res) && <Text>{JSON.stringify(tennisBallRes.res)}</Text>}
-                    </>}
-                </DivRow>
-                <TextInstruction>4. Ellipse mask tennis ball</TextInstruction>
-                <DivRow>
-                    {ellipseTf.loading && <ActivityIndicator />}
-                    {!ellipseTf.loading && <>
-                        {!isEmpty(ellipseTf.error) && <Text>{ellipseTf.error}</Text>}
-                        {!isEmpty(ellipseTf.uri) && <Image source={{ uri: ellipseTf.uri }} h={200} w={200} resizeMode="contain" />}
-                    </>}
-                </DivRow>
-                <TextInstruction>5. Skeletton</TextInstruction>
-                <DivRow>
-                    {resTf.loading && <ActivityIndicator />}
-                    {!resTf.loading && <>
-                        {!isEmpty(resTf.error) && <Text>{resTf.error}</Text>}
-                        {!isEmpty(resTf.uri) && <Image source={{ uri: resTf.uri }} h={200} w={200} resizeMode="contain" />}
-                    </>}
-                </DivRow>
-                <TextInstruction>6. Full features tensorflow</TextInstruction>
+                    </DivRow>
+                    <TextInstruction>3. Tennis ball detection</TextInstruction>
+                    <DivRow>
+                        {tennisBallRes.loading && <ActivityIndicator />}
+                        {!tennisBallRes.loading && <>
+                            {!isEmpty(tennisBallRes.error) && <Text>{tennisBallRes.error}</Text>}
+                            {!isEmpty(tennisBallRes.res) && <Text>{JSON.stringify(tennisBallRes.res)}</Text>}
+                        </>}
+                    </DivRow>
+                    <TextInstruction>4. Ellipse mask tennis ball</TextInstruction>
+                    <DivRow>
+                        {ellipseTf.loading && <ActivityIndicator />}
+                        {!ellipseTf.loading && <>
+                            {!isEmpty(ellipseTf.error) && <Text>{ellipseTf.error}</Text>}
+                            {!isEmpty(ellipseTf.uri) && <Image {...{ source: { uri: ellipseTf.uri }, resizeMode: 'contain' }} h={200} w={200} />}
+                        </>}
+                    </DivRow>
+                    <TextInstruction>5. Skeletton</TextInstruction>
+                    <DivRow>
+                        {resTf.loading && <ActivityIndicator />}
+                        {!resTf.loading && <>
+                            {!isEmpty(resTf.error) && <Text>{resTf.error}</Text>}
+                            {!isEmpty(resTf.uri) && <Image {...{ source: { uri: resTf.uri }, resizeMode: 'contain' }} h={200} w={200} />}
+                        </>}
+                    </DivRow>
+                    <TextInstruction>6. Full features tensorflow</TextInstruction>
 
 
+                </Div>
             </Div>
-        </Div>
+        </SafeAreaView>
     </ScrollView>
 }
 export default Home
