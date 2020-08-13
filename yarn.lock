@@ -728,6 +728,11 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
+"@danieldietrich/copy@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@danieldietrich/copy/-/copy-0.2.1.tgz#e768e9b28bab1c3aba3b714f59380210211467c1"
+  integrity sha512-Rz7zoBCAAZygtu65SwVex/ShONHX/8v5I6dGc3C/XRhuNLMNixpP/mL+bt+NXONXC0K16gKLCZalW6uWqiHKJg==
+
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"
@@ -3156,6 +3161,11 @@ expect@^26.0.1:
     jest-message-util "^26.0.1"
     jest-regex-util "^26.0.0"
 
+expo-asset-utils@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/expo-asset-utils/-/expo-asset-utils-1.2.0.tgz#df52f8e8c836c343ad713a0044db79be69cfe64b"
+  integrity sha512-06zVi5aXzyMq7SFiawxu2FUbpbVlxnE9W44cG4K5HyhLaqyRqss+o5MZMEGn8Ibd+008UiK7yCPy/bSpx2hVag==
+
 expo-asset@^8.1.7:
   version "8.1.7"
   resolved "https://registry.yarnpkg.com/expo-asset/-/expo-asset-8.1.7.tgz#32618e51f85df56f1d7dd54c71eb486ae7f7674e"
@@ -3197,6 +3207,14 @@ expo-file-system@~8.1.0:
   integrity sha512-xb4roeU8CotW8t3LkmsrliNbgFpY2KB+3sW1NnujnH39pFVwCd/kfujCYzRauj8aUy/HhSq+3xGkQTpC7pSjVw==
   dependencies:
     uuid "^3.4.0"
+
+expo-font@^8.2.2:
+  version "8.2.2"
+  resolved "https://registry.yarnpkg.com/expo-font/-/expo-font-8.2.2.tgz#c67ee8d3841921a907464d67e8098baeed92bacf"
+  integrity sha512-p/a7Ve+3LiR9ofn77U0UuuE6ZQiLVu3M1btiKUDe5efAp48D9GG41AevKQ7YnkfxTDdGJa0ACAtJAVsAD30jGA==
+  dependencies:
+    fbjs "1.0.0"
+    fontfaceobserver "^2.1.0"
 
 expo-gl-cpp@^8.2.0, expo-gl-cpp@~8.2.0:
   version "8.2.0"
@@ -3469,6 +3487,11 @@ flatted@^2.0.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-2.0.2.tgz#4575b21e2bcee7434aa9be662f4b7b5f9c2b5138"
   integrity sha512-r5wGx7YeOwNWNlCA0wQ86zKyDLMQr+/RB8xy74M4hTphfmjlijTSSXGuH8rnvKZnfT9i+75zmd8jcKdMR4O6jA==
 
+fontfaceobserver@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/fontfaceobserver/-/fontfaceobserver-2.1.0.tgz#e2705d293e2c585a6531c2a722905657317a2991"
+  integrity sha512-ReOsO2F66jUa0jmv2nlM/s1MiutJx/srhAe2+TE8dJCMi02ZZOcCTxTCQFr3Yet+uODUtnr4Mewg+tNQ+4V1Ng==
+
 for-in@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -3613,7 +3636,7 @@ glob-parent@^5.0.0:
   dependencies:
     is-glob "^4.0.1"
 
-glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
+glob@>=7, glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
   version "7.1.6"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.6.tgz#141f33b81a7c2492e125594307480c46679278a6"
   integrity sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
@@ -5931,6 +5954,17 @@ posix-character-classes@^0.1.0:
   resolved "https://registry.yarnpkg.com/posix-character-classes/-/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
 
+postinstall@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/postinstall/-/postinstall-0.7.0.tgz#4e93d4d305bfc11afc5a08cf06a058bcd4c8718e"
+  integrity sha512-DoaC21wTY/s+doVXo0mGOxBTbMLemRvEZSZg54p2Ez9iiYebUAyFtt7amAcs0cO2IAmqA8WXRT3eM/3lat9d5A==
+  dependencies:
+    "@danieldietrich/copy" "^0.2.1"
+    glob ">=7"
+    minimist "^1.2.0"
+    resolve-from ">=5"
+    resolve-pkg ">=2"
+
 prelude-ls@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
@@ -6416,6 +6450,11 @@ resolve-cwd@^3.0.0:
   dependencies:
     resolve-from "^5.0.0"
 
+resolve-from@>=5, resolve-from@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-5.0.0.tgz#c35225843df8f776df21c57557bc087e9dfdfc69"
+  integrity sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==
+
 resolve-from@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-3.0.0.tgz#b22c7af7d9d6881bc8b6e653335eebcb0a188748"
@@ -6426,10 +6465,12 @@ resolve-from@^4.0.0:
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
   integrity sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==
 
-resolve-from@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-5.0.0.tgz#c35225843df8f776df21c57557bc087e9dfdfc69"
-  integrity sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==
+resolve-pkg@>=2:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/resolve-pkg/-/resolve-pkg-2.0.0.tgz#ac06991418a7623edc119084edc98b0e6bf05a41"
+  integrity sha512-+1lzwXehGCXSeryaISr6WujZzowloigEofRB+dj75y9RRa/obVcYgbHJd53tdYw8pvZj8GojXaaENws8Ktw/hQ==
+  dependencies:
+    resolve-from "^5.0.0"
 
 resolve-url@^0.2.1:
   version "0.2.1"

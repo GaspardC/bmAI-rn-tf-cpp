@@ -8,12 +8,14 @@ import { image, scalar } from '@tensorflow/tfjs';
 const FEATURES_SIZE: [number, number] = [92, 92]
 const LIMBS_DROP_INDEXES = [9, 13]
 const N_LIMBS = 19
+const N_JOINTS = 19
 const N_RELEVANT_LIMBS = 17;
 const N_RELEVANT_JOINTS = 18;
 
 export function toDataUri(base64: string): string {
     return `data:image/jpeg;base64,${base64}`;
 }
+
 export async function resizeImage(
     imageUrl: string, height: number): Promise<ImageManipulator.ImageResult> {
     const actions = [{
@@ -57,20 +59,27 @@ export async function base64ImageToTensor(base64: string):
  * :return: features maps with shape [batch, height, width, 3] as a TF tensor.
  * */
 
-export async function build_features_full_tf(heat_maps_t: tf.Tensor4D, paf_maps_t: tf.Tensor4D, ball_mask: tf.Tensor2D, body_mask?) {
+export async function build_features_full_tf(skeleton_maps: tf.Tensor4D, ball_mask: tf.Tensor2D, body_mask?) {
+
+    console.log('build_features_full_tf ...')
+    // # Split the skeleton maps in limbs and joints maps
+    let heat_maps_t = tf.slice(skeleton_maps, [0, 0, 0, 0], [-1, -1, -1, N_JOINTS])
+    console.log('heat_maps_t', heat_maps_t)
+    let paf_maps_t = tf.slice(skeleton_maps, [0, 0, 0, N_JOINTS], [-1, -1, -1, N_JOINTS * 2])
+    console.log('paf_maps_t', paf_maps_t)
 
     // Resize the ball mask
     let ballMask: tf.Tensor4D = tf.expandDims(tf.expandDims(ball_mask, 0), 3);
     ballMask = tf.image.resizeNearestNeighbor(ballMask, FEATURES_SIZE)
 
     // Resize the maps
-    const heat_maps = tf.image.resizeNearestNeighbor(heat_maps_t, FEATURES_SIZE)
-    const paf_maps = tf.image.resizeNearestNeighbor(paf_maps_t, FEATURES_SIZE)
+    heat_maps_t = tf.image.resizeNearestNeighbor(heat_maps_t, FEATURES_SIZE)
+    paf_maps_t = tf.image.resizeNearestNeighbor(paf_maps_t, FEATURES_SIZE)
 
     // Split paf maps for each coordinate
     const [B, H, W, C] = paf_maps_t.shape;
-    const true_t = tf.tensor(true, [B, H, W, Math.floor(C / 2)])
-    const false_t = tf.tensor(false, [B, H, W, Math.floor(C / 2)])
+    const true_t = tf.ones([B, H, W, Math.floor(C / 2)], 'bool')
+    const false_t = tf.zeros([B, H, W, Math.floor(C / 2)], 'bool')
 
     // Prepare boolean masks
     const even_indexes_t = tf.reshape(tf.stack([true_t, false_t], -1), [B, H, W, C]);
@@ -84,16 +93,19 @@ export async function build_features_full_tf(heat_maps_t: tf.Tensor4D, paf_maps_
     const paf_d_maps_t = tf.sqrt(tf.add(tf.pow(paf_x_maps_t, tf.scalar(2.)), tf.pow(paf_y_maps_t, tf.scalar(2.))))
 
     // Select indexes corresponding to relevant limbs
-    const keep_indexes_t = tf.tile(tf.reshape(tf.tensor(new Array(N_LIMBS).fill(1).map((_, i) => i).filter(i => !LIMBS_DROP_INDEXES.includes(i))), [1, 1, 1, -1]), [B, H, W, 1])
+    const keep_indexes_t = tf.tile(tf.reshape(tf.tensor(new Array(N_LIMBS).fill(1).map((_, i) => i).map(i => !LIMBS_DROP_INDEXES.includes(i))), [1, 1, 1, -1]), [B, H, W, 1])
 
     // Get the limbs features
     const limbs_features_t = tf.sum(tf.reshape(await tf.booleanMaskAsync(paf_d_maps_t, keep_indexes_t), [B, H, W, N_RELEVANT_LIMBS]), -1, true)
 
+
     // Get the joints features
     const joints_features_t = tf.sum(tf.slice(heat_maps_t, [0, 0, 0, 0], [-1, -1, -1, N_RELEVANT_JOINTS]), -1, true)
 
+
     // Get the ball features
-    const ball_features_t = tf.cast(tf.reshape((ball_mask), [B, H, W, 1]), "float32")
+    const ball_mask_t = tf.expandDims(tf.expandDims(ballMask, 0), 3)
+    const ball_features_t = tf.cast(tf.reshape((ball_mask_t), [B, H, W, 1]), "float32")
 
     // Concatenate features along last dimension
     let features_t = tf.concat([limbs_features_t, joints_features_t, ball_features_t], -1)
@@ -104,7 +116,8 @@ export async function build_features_full_tf(heat_maps_t: tf.Tensor4D, paf_maps_
         body_features_t = tf.cast(tf.reshape((body_mask), [B, H, W, 1]), "float32")
         features_t = tf.concat([features_t, body_features_t], -1)
     }
-
+    console.log('features_t done')
+    // return { base64: await tensorToImage64(features_t), features_t }
     return features_t;
 }
 
@@ -255,6 +268,6 @@ export const draw_ellipse_full_tf = async ({ ellipseParams, resolution }) => {
 
     })
 
-    return await tensorToImage64(mask_t);
+    return { base64: await tensorToImage64(mask_t), ballMask: mask_t };
 
 }

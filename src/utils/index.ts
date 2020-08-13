@@ -15,3 +15,15 @@ export const isIos = () => Platform.OS === 'ios'
 
 //@ts-ignore
 export const isDev = () => __DEV__
+
+
+export function isJSON(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+export const logError = e => isJSON(e) ? JSON.stringify(e) : e;

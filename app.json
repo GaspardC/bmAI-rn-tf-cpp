@@ -1,4 +1,5 @@
 {
   "name": "rncpp",
-  "displayName": "rncpp"
+  "displayName": "bmAI",
+  "assetBundlePatterns": ["src/assets/images/*"]
 }

@@ -9,7 +9,10 @@
     "test": "jest",
     "lint": "eslint .",
     "djini:android": "./run_djinni.sh && cd android && ./gradlew clean && cd .. && yarn android",
-    "djini:ios": "./run_djinni.sh && yarn ios"
+    "djini:ios": "./run_djinni.sh && yarn ios",
+    "build-android": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res/ && rm -rf ./android/app/src/main/res/drawable-mdpi/ && rm -rf ./android/app/src/main/res/raw/",
+    "release-android": "yarn build-android && cd ./android && ./gradlew bundleRelease",
+    "postinstall": "node ./android/fixAndroid/android-release-fix.js"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.11.0",
@@ -21,7 +24,9 @@
     "@tensorflow/tfjs-react-native": "^0.3.0",
     "color": "^3.1.2",
     "expo-asset": "^8.1.7",
+    "expo-asset-utils": "^1.2.0",
     "expo-camera": "^8.2.0",
+    "expo-font": "^8.2.2",
     "expo-gl": "^8.2.0",
     "expo-gl-cpp": "^8.2.0",
     "expo-image-manipulator": "^8.1.0",
@@ -29,6 +34,7 @@
     "jpeg-js": "^0.4.0",
     "lodash": "^4.17.19",
     "pod-install": "^0.1.7",
+    "postinstall": "^0.7.0",
     "react": "16.11.0",
     "react-native": "0.62.2",
     "react-native-animatable": "^1.3.3",

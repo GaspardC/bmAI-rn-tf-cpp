@@ -314,6 +314,12 @@ namespace helloworld
         return result_uri;
     }
 
+    auto noEllipseFound()
+    {
+        string sU = "[-1, -1, -1, -1]";
+        return "{\"value\":\"" + to_string(0) + R"(", "x_mean":")" + to_string(-1) + R"(", "y_mean":")" + to_string(-1) + R"(", "a":")" + to_string(-1) + R"(", "b":")" + to_string(-1) + R"(", "sU":")" + sU + "\"}";
+    }
+
     string launch_detection(const std::string &uri, const bool isIos)
     {
         cv::Mat res;
@@ -358,6 +364,10 @@ namespace helloworld
         // return vector;
 
         auto [bbox, _unsuedImg2] = find_ball(img_filtered);
+        if (bbox[0] == 2147483647)
+        {
+            return noEllipseFound();
+        }
         auto bbox_re = get_bbox_rescaled(bbox, fx, frameOrient.cols, frameOrient.rows);
 
         // STEP 2: Process image full resolution for precision
@@ -389,6 +399,11 @@ namespace helloworld
         auto a = get<2>(ellipse_values);
         auto b = get<3>(ellipse_values);
         auto U = get<4>(ellipse_values);
+
+        if (x_mean == -1.0)
+        {
+            return noEllipseFound();
+        }
 
         // convert U to string
         string sU = "[" + to_string(U.at<float>(0, 0)) + "," + to_string(U.at<float>(0, 1)) + "," + to_string(U.at<float>(1, 0)) + "," + to_string(U.at<float>(1, 1)) + "]";

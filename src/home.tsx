@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { Div, Image, Text, Button } from 'react-native-magnus';
-import { isIos } from './utils';
+import { isIos, logError } from './utils';
 import { isEmpty } from 'lodash'
 import {
     SafeAreaView,
@@ -30,12 +30,14 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
 import { downloadAssetSource, getFilePath, getFileUri } from './utils/uriHelper';
-import { base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse_full_tf, resizeImage, EllipseType } from './utils/tf_utils';
+import { base64ImageToTensor, tensorToImageUrl_thomas, draw_ellipse_full_tf, resizeImage, EllipseType, build_features_full_tf } from './utils/tf_utils';
 import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 import { Tensor4D } from '@tensorflow/tfjs';
 import { initSentry, isDev } from './utils/index';
+import { loadRemotely } from './utils/uriHelper';
 
-const imageDefault = require('./assets/images/ball.jpg');
+// const imageDefault = require('./assets/images/ball.jpg');
+const imageDefaultRemote = { uri: 'https://i.imgur.com/MlFb9rY.jpg', height: 0, width: 0 }
 let model;
 
 const { HelloWorld: CppDetectTennisBall } = NativeModules;
@@ -43,20 +45,34 @@ const { HelloWorld: CppDetectTennisBall } = NativeModules;
 const RESIZE_HEIGHT = 700;
 
 const Home = () => {
-    const [imageSource, setImageSrouce] = useState(imageDefault)
+    const [imageSource, setImageSource] = useState(imageDefaultRemote)
+    const [imageDefault, setImageDefault] = useState(imageDefaultRemote)
+
     const [tennisBallRes, setTennisBallRes] = useState<{ res?: EllipseType; loading?: boolean; error?: string }>({ res: {}, loading: false, error: '' })
     const [isTfReady, setTfReady] = useState(false);
-    const [resTf, setResTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ loading: false, error: '', uri: '' })
-    const [ellipseTf, setEllipseTf] = useState<{ loading?: boolean; error?: string; uri?: string; }>({ loading: false, error: '', uri: '' })
+    const [resTf, setResTf] = useState<{ loading?: boolean; error?: string; uri?: string; tensor4D?: tf.Tensor4D }>({ loading: false, error: '', uri: '', tensor4D: null })
+    const [ellipseTf, setEllipseTf] = useState<{ loading?: boolean; error?: string; uri?: string; ballMask?: tf.Tensor2D }>({ loading: false, error: '', uri: '', ballMask: null })
+    const [resFullTf, setResFullTf] = useState<{ loading?: boolean; error?: string; res?: string; }>({ loading: false, error: '', res: '' })
+
+    // useEffect(() => {
+    //     const todel = { ...imageSource }
+    //     delete todel['base64']
+
+    //     console.log('imageSource', todel)
+    // }, [imageSource])
 
     useEffect(() => {
-        const todel = { ...imageSource }
-        delete todel['base64']
+        const mount = async () => {
+            const imageLoaded = await getImageDefault()
+            //@ts-ignore
+            setImageDefault(imageLoaded)
 
-        console.log('imageSource', todel)
-    }, [imageSource])
-    useEffect(() => {
-        getImageSource(imageSource).then(res => setImageSrouce(res))
+            getImageSource(imageLoaded).then(res => {
+                setImageSource(res)
+            }).catch(e => console.log(e))
+        }
+        mount()
+
     }, [])
 
     const openPicker = () => {
@@ -74,16 +90,17 @@ const Home = () => {
                 // console.log('response is ', response);
                 const image = await resizeImage(response.uri, RESIZE_HEIGHT);
                 const source = {
-                    path: isIos() ? image.uri : response.path,
+                    path: image.uri, //isIos() ? image.uri : response.path,
                     ...image,
-                    uriBoth: isIos() ? image.uri : 'file://' + response.path,
+                    uriBoth: image.uri, // isIos() ? image.uri : 'file://' + response.path,
                 };
-
 
                 // You can also display the image using data:
                 // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-                console.log('source is ', source);
-                setImageSrouce(source)
+                const logSource = { ...source };
+                delete logSource['base64']
+                console.log('source is ', logSource);
+                setImageSource(source)
                 // run(source)
             }
         });
@@ -129,7 +146,7 @@ const Home = () => {
 
             const imageUrl = await tensorToImageUrl_thomas(res);
             // console.log(`tfcode ${Date.now() - startTimeTfCode}`);
-            setResTf(prev => ({ ...prev, uri: `data:image/jpeg;base64,${imageUrl}` }))
+            setResTf(prev => ({ ...prev, uri: `data:image/jpeg;base64,${imageUrl}`, tensor4D: res }))
             // console.log(`imageUrl ${imageUrl}`);
         } catch (err) {
             setResTf(prev => ({ ...prev, error: err ?? 'error model' }))
@@ -186,8 +203,8 @@ const Home = () => {
             }
             const ellipseParams = tennisBallRes.res
             setEllipseTf(prev => ({ ...prev, loading: true }))
-            const ellipseBase64 = await draw_ellipse_full_tf({ ellipseParams, resolution: [imageSource.height, imageSource.width] });
-            setEllipseTf(prev => ({ ...prev, uri: `data:image/jpeg;base64,${ellipseBase64}` }))
+            const { base64: ellipseBase64, ballMask } = await draw_ellipse_full_tf({ ellipseParams, resolution: [imageSource.height, imageSource.width] });
+            setEllipseTf(prev => ({ ...prev, uri: `data:image/jpeg;base64,${ellipseBase64}`, ballMask }))
         } catch (e) {
             setEllipseTf(prev => ({ ...prev, error: e }))
         }
@@ -224,8 +241,20 @@ const Home = () => {
         })
     }, [tennisBallRes.res])
 
+    useEffect(() => {
+        if (!resTf.tensor4D || !ellipseTf.ballMask) return;
+        setResFullTf({ loading: true })
+        build_features_full_tf(resTf.tensor4D, ellipseTf.ballMask).then(() => {
+            setResFullTf({ loading: false, res: 'features computed' })
+        })
+            .catch(e => {
+                console.log(e)
+                setResFullTf({ loading: false, res: 'features NOT computed' })
+            })
+    }, [resTf.tensor4D, ellipseTf.ballMask])
+
     const resetToDefault = ({ resetImage = true }: { resetImage?: boolean }) => {
-        if (resetImage) getImageSource(imageDefault).then(res => setImageSrouce(res))
+        if (resetImage) getImageSource(imageDefault).then(res => setImageSource(res)).catch(e => console.log(e))
         setEllipseTf({ loading: false })
         setResTf({ loading: false })
         setTennisBallRes({ loading: false })
@@ -233,13 +262,21 @@ const Home = () => {
 
     const isRunning = () => ellipseTf.loading || resTf.loading || tennisBallRes.loading
 
+    const getImageSource = async (imageSource) => {
+        if (imageSource.uri != null) return imageSource;
+        const sourceFile = await getFilePath(imageDefault)
+        return await resizeImage(sourceFile, RESIZE_HEIGHT);
+    }
+
     return <ScrollView style={styles.scrollView}>
         <SafeAreaView>
             <Div p={'lg'}>
                 <Div>
                     <TextInstruction>1. Chose a photo :</TextInstruction>
                     <DivRow>
-                        <Image {...{ source: { uri: imageSource.uri }, resizeMode: 'contain' }} h={200} w={200}></Image>
+                        {imageSource.uri != null && <Image {...{ source: { uri: imageSource.uri }, resizeMode: 'contain' }} h={200} w={200}></Image>}
+                        {/* {!imageSource.uri && <Image {...{ source: imageDefault, resizeMode: 'contain' }} h={200} w={200}></Image>} */}
+                        {/* <Text>{JSON.stringify(imageSource)}</Text> */}
                     </DivRow>
                     <DivRow justifyContent="space-around">
                         <Button {...{ onPress: openPicker, underlayColor: 'blue100' }} bg="white" borderWidth={1} borderColor="blue500" color="blue500">Chose another one</Button>
@@ -255,7 +292,7 @@ const Home = () => {
                     <DivRow>
                         {tennisBallRes.loading && <ActivityIndicator />}
                         {!tennisBallRes.loading && tennisBallRes.res?.a !== -1 && <>
-                            {!isEmpty(tennisBallRes.error) && <Text>{tennisBallRes.error}</Text>}
+                            {!isEmpty(tennisBallRes.error) && <Text>{logError(tennisBallRes.error)}</Text>}
                             {!isEmpty(tennisBallRes.res) && <Text>{JSON.stringify(tennisBallRes.res)}</Text>}
                         </>}
                         {tennisBallRes.res?.a === -1 && <Text>No tennis ball found</Text>}
@@ -265,7 +302,7 @@ const Home = () => {
                     <DivRow>
                         {ellipseTf.loading && <ActivityIndicator />}
                         {!ellipseTf.loading && tennisBallRes.res?.a !== -1 && <>
-                            {!isEmpty(ellipseTf.error) && <Text>{ellipseTf.error}</Text>}
+                            {!isEmpty(ellipseTf.error) && <Text>{logError(ellipseTf.error)}</Text>}
                             {!isEmpty(ellipseTf.uri) && <Image {...{ source: { uri: ellipseTf.uri }, resizeMode: 'contain' }} h={200} w={200} />}
                         </>}
                         {tennisBallRes.res?.a === -1 && <Text>No tennis ball found</Text>}
@@ -274,13 +311,18 @@ const Home = () => {
                     <DivRow>
                         {resTf.loading && <ActivityIndicator />}
                         {!resTf.loading && <>
-                            {!isEmpty(resTf.error) && <Text>{resTf.error}</Text>}
+                            {!isEmpty(resTf.error) && <Text>{logError(resTf.error)}</Text>}
                             {!isEmpty(resTf.uri) && <Image {...{ source: { uri: resTf.uri }, resizeMode: 'contain' }} h={200} w={200} />}
                         </>}
                     </DivRow>
                     <TextInstruction>6. Full features tensorflow</TextInstruction>
-
-
+                    <DivRow>
+                        {resFullTf.loading && <ActivityIndicator />}
+                        {!resFullTf.loading && <>
+                            {!isEmpty(resFullTf.error) && <Text>{logError(resFullTf.error)}</Text>}
+                            {!isEmpty(resFullTf.res) && <Text>{logError(resFullTf.res)}</Text>}
+                        </>}
+                    </DivRow>
                 </Div>
             </Div>
         </SafeAreaView>
@@ -298,8 +340,8 @@ const DivRow = ({ children, ...otherProps }) => <Div row justifyContent="center"
 const TextInstruction = ({ children }) => <Text fontWeight="bold" fontSize="cl">{children}</Text>
 
 
-const getImageSource = async (imageSource) => {
-    if (imageSource.uri) return imageSource;
-    const sourceFile = await getFilePath(imageDefault)
-    return await resizeImage(sourceFile, RESIZE_HEIGHT);
+
+
+const getImageDefault = () => {
+    return loadRemotely(imageDefaultRemote.uri)
 }

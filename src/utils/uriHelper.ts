@@ -1,5 +1,6 @@
 import RNFS from 'react-native-fs'
 import { Asset } from 'expo-asset';
+import AssetUtils from 'expo-asset-utils';
 
 function getFilename(source_uri) {
     try {
@@ -21,6 +22,11 @@ function getFilename(source_uri) {
     } catch (e) {
         console.log(e)
     }
+
+}
+
+export const loadRemotely = (uri): Promise<typeof Asset> => {
+    return AssetUtils.resolveAsync(uri)
 
 }
 
