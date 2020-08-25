@@ -19,11 +19,13 @@ export function toDataUri(base64: string): string {
 export async function resizeImage(
   imageUrl: string,
   height: number,
+  width?: number,
 ): Promise<ImageManipulator.ImageResult> {
   const actions = [
     {
       resize: {
         height,
+        ...(width && {width}),
       },
     },
   ];
@@ -42,6 +44,7 @@ export async function resizeImage(
 
 export async function base64ImageToTensor(
   base64: string,
+  normalize?: boolean,
 ): Promise<tf.Tensor4D> {
   const rawImageData = tf.util.encodeString(base64, 'base64');
   const TO_UINT8ARRAY = true;
@@ -49,10 +52,11 @@ export async function base64ImageToTensor(
   // Drop the alpha channel info
   const buffer = new Float32Array(width * height * 3);
   let offset = 0; // offset into original data
+  const divNorm = normalize ? 255 : 1;
   for (let i = 0; i < buffer.length; i += 3) {
-    buffer[i] = data[offset];
-    buffer[i + 1] = data[offset + 1];
-    buffer[i + 2] = data[offset + 2];
+    buffer[i] = data[offset] / divNorm;
+    buffer[i + 1] = data[offset + 1] / divNorm;
+    buffer[i + 2] = data[offset + 2] / divNorm;
     offset += 4;
   }
   return tf.tensor4d(buffer, [1, height, width, 3]);
@@ -368,13 +372,21 @@ export const draw_ellipse_full_tf = async ({ellipseParams, resolution}) => {
   return {base64: await tensorToImage64(mask_t), ballMask: mask_t};
 };
 
-export const loadModel = async ({modelJson, modelWeights}) => {
-  await tf.ready();
-  console.log('tf ready');
-  const startTimeModel = Date.now();
-  const model = await tf.loadGraphModel(
-    bundleResourceIO(modelJson, modelWeights),
-  );
-  console.log(`loading model in ${Date.now() - startTimeModel}`);
-  return model;
+export const loadModel = async ({
+  modelJson,
+  modelWeights,
+  loadLayer = false,
+}) => {
+  try {
+    await tf.ready();
+    console.log('tf ready');
+
+    const startTimeModel = Date.now();
+    const tfLoader = loadLayer ? tf.loadGraphModel : tf.loadLayersModel;
+    const model = await tfLoader(bundleResourceIO(modelJson, modelWeights));
+    console.log(`loading model in ${Date.now() - startTimeModel}`);
+    return model;
+  } catch (err) {
+    console.log('error loading model', err);
+  }
 };

@@ -19,8 +19,8 @@ initSentry();
 export default function Main() {
   return (
     <ThemeProvider>
-      <Home />
-      {/* <CNNPage /> */}
+      {/* <Home /> */}
+      <CNNPage />
       {/* <Menu /> */}
     </ThemeProvider>
   );

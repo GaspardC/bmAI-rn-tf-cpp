@@ -16,23 +16,55 @@ import {
 } from '../../utils/uriHelper';
 import {resizeImage} from '../../utils/tf_utils';
 
-const imageDefaultRemote = {
-  uri: 'https://i.imgur.com/MlFb9rY.jpg',
+const TEST_IMGS = [
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/ball.jpg?alt=media&token=ede33521-cf9a-4f01-99a0-3d02cd5789ad',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513310.jpg?alt=media&token=bc395c98-82b1-4879-b125-bf6065c28ba2',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513315-F_0.jpg?alt=media&token=5f26e625-c273-461f-b06d-77baa579b28e',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513319-F_0.jpg?alt=media&token=e0b50e4b-5865-4450-9cdd-faed7e2f8f69',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513320-F_0.jpg?alt=media&token=206095d8-7ccc-468a-a292-bd8315aa28ec',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513336-F_0.jpg?alt=media&token=3e0e32c9-534f-4d82-aefb-a6104a4bccee',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513337-F_0.jpg?alt=media&token=74b77411-aa47-4bcb-99d0-4416716f04cc',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513318-F_0.jpg?alt=media&token=6cfb2867-e3b4-49a8-84f8-af651309c8a8',
+  'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513317-F_0.jpg?alt=media&token=8ee3815a-f557-4a50-9454-3dc22777efb9',
+];
+
+export const imageDefaultRemote = {
+  uri: __DEV__ ? TEST_IMGS[0] : 'https://i.imgur.com/MlFb9rY.jpg',
   height: 0,
   width: 0,
 };
+
+export const getAllTestImg = TEST_IMGS.map((url) => ({
+  uri: url,
+  height: 0,
+  width: 0,
+}));
 export const RESIZE_HEIGHT = 700;
 
-const PhotoPicker = forwardRef(({resetToDefault}, ref) => {
+const PhotoPicker = forwardRef(({resetToDefault: resetToDefaultProps}, ref) => {
   const [imageSource, setImageSource] = useState(imageDefaultRemote);
   const [imageDefault, setImageDefault] = useState(imageDefaultRemote);
 
   const getImageSource = async (imageSource) => {
-    console.log('image source', imageSource);
+    // console.log('image source', imageSource);
     if (imageSource?.uri != null) return imageSource;
     const sourceFile = await getFilePath(imageDefault);
     return await resizeImage(sourceFile, RESIZE_HEIGHT);
   };
+
+  const mount = async () => {
+    const imageLoaded = await getImageDefault();
+    //@ts-ignore
+    setImageDefault(imageLoaded);
+
+    getImageSource(imageLoaded)
+      .then((res) => {
+        setImageSource(res);
+      })
+      .catch((e) => console.log(e));
+  };
+
+  const resetToDefault = resetToDefaultProps ? resetToDefaultProps : mount;
 
   useImperativeHandle(
     ref,
@@ -40,27 +72,17 @@ const PhotoPicker = forwardRef(({resetToDefault}, ref) => {
       imageSource,
       getImageSource,
       setImageSource,
+      resetToDefault: mount,
     }),
     [imageSource],
   );
 
   useEffect(() => {
-    const mount = async () => {
-      const imageLoaded = await getImageDefault();
-      //@ts-ignore
-      setImageDefault(imageLoaded);
-
-      getImageSource(imageLoaded)
-        .then((res) => {
-          setImageSource(res);
-        })
-        .catch((e) => console.log(e));
-    };
     mount();
   }, []);
 
   const openPicker = () => {
-    resetToDefault({});
+    resetToDefault ? resetToDefault({}) : mount();
     const options = {
       noData: true,
       maxHeight: RESIZE_HEIGHT,
@@ -131,6 +153,6 @@ const PhotoPicker = forwardRef(({resetToDefault}, ref) => {
 });
 export default PhotoPicker;
 
-const getImageDefault = () => {
-  return loadRemotely(imageDefaultRemote.uri);
+export const getImageDefault = (uri?) => {
+  return loadRemotely(uri ? uri : imageDefaultRemote.uri);
 };
