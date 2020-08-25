@@ -27,7 +27,7 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
-import {downloadAssetSource, getFilePath, getFileUri} from '../utils/uriHelper';
+import {downloadAssetSource, getFileUri} from '../utils/uriHelper';
 import {
   base64ImageToTensor,
   tensorToImageUrl_thomas,
@@ -35,8 +35,8 @@ import {
   resizeImage,
   EllipseType,
   build_features_full_tf,
+  loadModel,
 } from '../utils/tf_utils';
-import {bundleResourceIO} from '@tensorflow/tfjs-react-native';
 import {Tensor4D} from '@tensorflow/tfjs';
 import {initSentry, isDev} from '../utils/index';
 import {rotateImageIfNeeded} from '../utils/uriHelper';
@@ -47,21 +47,13 @@ import {RESIZE_HEIGHT} from '../components/photoPicker/index';
 import TextInstruction from '../components/text/instruction';
 
 // const imageDefault = require('../assets/images/ball.jpg');
-const imageDefaultRemote = {
-  uri: 'https://i.imgur.com/MlFb9rY.jpg',
-  height: 0,
-  width: 0,
-};
+
 let model;
 
 const {HelloWorld: CppDetectTennisBall} = NativeModules;
 
 const Home = () => {
   const photoPickerRef = useRef({});
-  const {
-    current: {imageSource, setImageSource},
-  } = photoPickerRef;
-  const [imageDefault, setImageDefault] = useState(imageDefaultRemote);
 
   const [tennisBallRes, setTennisBallRes] = useState<{
     res?: EllipseType;
@@ -88,15 +80,10 @@ const Home = () => {
   }>({loading: false, error: '', res: ''});
 
   async function waitForTensorFlowJs() {
-    await tf.ready();
-
     const modelJson = require('../assets/model/frozen/model.json');
     const modelWeights = require('../assets/model/frozen/group1-shard1of1.bin');
+    model = await loadModel({modelJson, modelWeights});
 
-    const startTimeModel = Date.now();
-    model = await tf.loadGraphModel(bundleResourceIO(modelJson, modelWeights));
-
-    console.log(`loading model in ${Date.now() - startTimeModel}`);
     setTfReady(true);
     return model;
   }
@@ -183,7 +170,10 @@ const Home = () => {
       setEllipseTf((prev) => ({...prev, loading: true}));
       const {base64: ellipseBase64, ballMask} = await draw_ellipse_full_tf({
         ellipseParams,
-        resolution: [imageSource.height, imageSource.width],
+        resolution: [
+          photoPickerRef.current.imageSource.height,
+          photoPickerRef.current.imageSource.width,
+        ],
       });
       setEllipseTf((prev) => ({
         ...prev,
@@ -206,7 +196,10 @@ const Home = () => {
     if (!isTfReady) {
       await waitForTensorFlowJs();
     }
-    const image = await getImageSource(imageSource);
+    console.log('pickerref', photoPickerRef.current);
+    const image = await photoPickerRef.current.getImageSource(
+      photoPickerRef.current.imageSource,
+    );
     const img2log = {...image};
     delete img2log['base64'];
     console.log('run on image', img2log);
@@ -220,9 +213,11 @@ const Home = () => {
 
   useEffect(() => {
     if (isEmpty(tennisBallRes.res)) return;
-    getImageSource(imageSource).then(({uri}) => {
-      processTFImg(uri);
-    });
+    photoPickerRef.current
+      .getImageSource(photoPickerRef.current.imageSource)
+      .then(({uri}) => {
+        processTFImg(uri);
+      });
   }, [tennisBallRes.res]);
 
   useEffect(() => {
@@ -240,7 +235,8 @@ const Home = () => {
 
   const resetToDefault = ({resetImage = true}: {resetImage?: boolean}) => {
     if (resetImage)
-      getImageSource(imageDefault)
+      photoPickerRef.current
+        .getImageSource(imageDefault)
         .then((res) => setImageSource(res))
         .catch((e) => console.log(e));
     setEllipseTf({loading: false, error: '', uri: '', ballMask: null});
@@ -251,12 +247,6 @@ const Home = () => {
 
   const isRunning = () =>
     ellipseTf.loading || resTf.loading || tennisBallRes.loading;
-
-  const getImageSource = async (imageSource) => {
-    if (imageSource.uri != null) return imageSource;
-    const sourceFile = await getFilePath(imageDefault);
-    return await resizeImage(sourceFile, RESIZE_HEIGHT);
-  };
 
   return (
     <ScrollView style={styles.scrollView}>

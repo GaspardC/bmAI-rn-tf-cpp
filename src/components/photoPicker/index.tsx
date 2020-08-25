@@ -25,11 +25,20 @@ export const RESIZE_HEIGHT = 700;
 
 const PhotoPicker = forwardRef(({resetToDefault}, ref) => {
   const [imageSource, setImageSource] = useState(imageDefaultRemote);
+  const [imageDefault, setImageDefault] = useState(imageDefaultRemote);
+
+  const getImageSource = async (imageSource) => {
+    console.log('image source', imageSource);
+    if (imageSource?.uri != null) return imageSource;
+    const sourceFile = await getFilePath(imageDefault);
+    return await resizeImage(sourceFile, RESIZE_HEIGHT);
+  };
 
   useImperativeHandle(
     ref,
     () => ({
-      imageSource: () => imageSource,
+      imageSource,
+      getImageSource,
       setImageSource,
     }),
     [imageSource],
@@ -49,12 +58,6 @@ const PhotoPicker = forwardRef(({resetToDefault}, ref) => {
     };
     mount();
   }, []);
-
-  const getImageSource = async (imageSource) => {
-    if (imageSource.uri != null) return imageSource;
-    const sourceFile = await getFilePath(imageDefault);
-    return await resizeImage(sourceFile, RESIZE_HEIGHT);
-  };
 
   const openPicker = () => {
     resetToDefault({});
@@ -96,7 +99,7 @@ const PhotoPicker = forwardRef(({resetToDefault}, ref) => {
   return (
     <Fragment>
       <DivRow>
-        {imageSource.uri != null && (
+        {imageSource?.uri != null && (
           <Image
             {...{source: {uri: imageSource.uri}, resizeMode: 'contain'}}
             h={200}
