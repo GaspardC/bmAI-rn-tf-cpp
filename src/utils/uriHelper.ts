@@ -25,7 +25,7 @@ function getFilename(source_uri) {
   }
 }
 
-export const loadRemotely = (uri): Promise<typeof Asset> => {
+export const loadRemotely = (uri): Promise<InstanceType<typeof Asset>> => {
   return AssetUtils.resolveAsync(uri);
 };
 

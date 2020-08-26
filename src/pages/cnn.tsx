@@ -5,7 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import {Div, Image, Text, Button} from 'react-native-magnus';
+import {Div, Text, Button} from 'react-native-magnus';
 import TextInstruction from '../components/text/instruction';
 import PhotoPicker, {getImageDefault} from '../components/photoPicker';
 import {DivRow} from '../components/layout';
@@ -14,11 +14,13 @@ import {
   loadModel,
   resizeImage,
   base64ImageToTensor,
-  tensorToImageUrl_thomas,
 } from '../utils/tf_utils';
-import * as tf from '@tensorflow/tfjs';
 import {getAllTestImg} from '../components/photoPicker/index';
-const MODE_CHAIN = __DEV__ && false;
+import { isDev } from '../utils';
+import { Tensor4D } from '@tensorflow/tfjs';
+import { logError } from '../utils/index';
+
+const MODE_CHAIN = isDev() && false;
 
 const SIZE_INPUT_MODEL = 224;
 const MEAN_VALUES = {
@@ -29,19 +31,18 @@ const MEAN_VALUES = {
 let model;
 
 const CnnPage = () => {
-  const photoPickerRef = useRef({});
+  const photoPickerRef = useRef({}) as {current: any} ;
 
   const [resTf, setResTf] = useState<{
-    res?: EllipseType;
+    res?: {height:number, weight:number};
     loading?: boolean;
     error?: string;
-  }>({res: {}, loading: false, error: ''});
+  }>({res:null, loading: false, error: ''});
 
   useEffect(() => {
     loadCNNModel();
   });
 
-  const resetToDefault = photoPickerRef.current.resetToDefault;
   const loadCNNModel = async () => {
     const modelWeights = require('../assets/cnn_model/group1-shard1of1.bin');
     const modelJson = require('../assets/cnn_model/model.json');
@@ -61,9 +62,9 @@ const CnnPage = () => {
       try {
         const img = getAllTestImg[i];
         // console.log(img);
-        const asset = await getImageDefault(img.uri);
+        const assetDefault = await getImageDefault(img.uri);
         // console.log('uri', asset.uri);
-        await processTFImg(asset.uri);
+        await processTFImg(assetDefault.uri);
         // processTFImg(photoPickerRef.current.imageSource.uri);
       } catch (err) {
         console.log('err getting image default', err);
@@ -102,7 +103,7 @@ const CnnPage = () => {
       const resData = res.dataSync();
       const height = resData[0] + MEAN_VALUES.cm;
       const weight = resData[1] + MEAN_VALUES.kg;
-      if (__DEV__) console.log(`prediction is ${height} cm and  ${weight} kg `);
+      if (isDev()) console.log(`prediction is ${height} cm and  ${weight} kg `);
 
       // const imageUrl = await tensorToImageUrl_thomas(res);
       // console.log(`tfcode ${Date.now() - startTimeTfCode}`);
@@ -145,7 +146,7 @@ const CnnPage = () => {
             <TextInstruction>3. CNN prediction</TextInstruction>
             <DivRow>
               {resTf.loading && <ActivityIndicator />}
-              {!resTf.loading && resTf.res?.a !== -1 && (
+              {!resTf.loading && (
                 <>
                   {!isEmpty(resTf.error) && (
                     <Text>{logError(resTf.error)}</Text>
@@ -155,7 +156,6 @@ const CnnPage = () => {
                   )}
                 </>
               )}
-              {resTf.res?.a === -1 && <Text>No res</Text>}
             </DivRow>
           </Div>
         </Div>

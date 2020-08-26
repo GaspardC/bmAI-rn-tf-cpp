@@ -2,11 +2,10 @@ import React, {
   useState,
   useImperativeHandle,
   Fragment,
-  useRef,
   useEffect,
   forwardRef,
 } from 'react';
-import {Div, Image, Text, Button} from 'react-native-magnus';
+import {Image, Button} from 'react-native-magnus';
 import {DivRow} from '../layout';
 import ImagePicker from 'react-native-image-picker';
 import {
@@ -15,6 +14,7 @@ import {
   loadRemotely,
 } from '../../utils/uriHelper';
 import {resizeImage} from '../../utils/tf_utils';
+import { isDev } from '../../utils/index';
 
 const TEST_IMGS = [
   'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/ball.jpg?alt=media&token=ede33521-cf9a-4f01-99a0-3d02cd5789ad',
@@ -29,7 +29,7 @@ const TEST_IMGS = [
 ];
 
 export const imageDefaultRemote = {
-  uri: __DEV__ ? TEST_IMGS[0] : 'https://i.imgur.com/MlFb9rY.jpg',
+  uri: isDev() ? TEST_IMGS[0] : 'https://i.imgur.com/MlFb9rY.jpg',
   height: 0,
   width: 0,
 };
@@ -41,11 +41,12 @@ export const getAllTestImg = TEST_IMGS.map((url) => ({
 }));
 export const RESIZE_HEIGHT = 700;
 
-const PhotoPicker = forwardRef(({resetToDefault: resetToDefaultProps}, ref) => {
+const PhotoPicker = forwardRef(({resetToDefault: resetToDefaultProps}:any, ref) => {
   const [imageSource, setImageSource] = useState(imageDefaultRemote);
   const [imageDefault, setImageDefault] = useState(imageDefaultRemote);
 
-  const getImageSource = async (imageSource) => {
+  const getImageSource = async (imageSourceProps?) => {
+    const imageSource =   imageSourceProps ?? await getImageDefault();
     // console.log('image source', imageSource);
     if (imageSource?.uri != null) return imageSource;
     const sourceFile = await getFilePath(imageDefault);

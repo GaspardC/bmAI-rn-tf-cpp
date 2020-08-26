@@ -379,7 +379,7 @@ export const loadModel = async ({
 }) => {
   try {
     await tf.ready();
-    console.log('tf ready');
+    // console.log('tf ready');
 
     const startTimeModel = Date.now();
     const tfLoader = loadLayer ? tf.loadGraphModel : tf.loadLayersModel;
