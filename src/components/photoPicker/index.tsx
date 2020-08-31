@@ -29,7 +29,7 @@ const TEST_IMGS = [
 ];
 
 export const imageDefaultRemote = {
-  uri: isDev() ? TEST_IMGS[0] : 'https://i.imgur.com/MlFb9rY.jpg',
+  uri: 'https://i.imgur.com/MlFb9rY.jpg',
   height: 0,
   width: 0,
 };

@@ -1,8 +1,8 @@
 import * as tf from '@tensorflow/tfjs';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as jpeg from 'jpeg-js';
-import {image, scalar} from '@tensorflow/tfjs';
-import {bundleResourceIO} from '@tensorflow/tfjs-react-native';
+import { image, scalar } from '@tensorflow/tfjs';
+import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
 
 // Height and width of the input features of the second model
 const FEATURES_SIZE: [number, number] = [92, 92];
@@ -25,7 +25,7 @@ export async function resizeImage(
     {
       resize: {
         height,
-        ...(width && {width}),
+        ...(width && { width }),
       },
     },
   ];
@@ -48,7 +48,7 @@ export async function base64ImageToTensor(
 ): Promise<tf.Tensor4D> {
   const rawImageData = tf.util.encodeString(base64, 'base64');
   const TO_UINT8ARRAY = true;
-  const {width, height, data} = jpeg.decode(rawImageData); //TO_UINT8ARRAY
+  const { width, height, data } = jpeg.decode(rawImageData); //TO_UINT8ARRAY
   // Drop the alpha channel info
   const buffer = new Float32Array(width * height * 3);
   let offset = 0; // offset into original data
@@ -307,9 +307,9 @@ export type EllipseType = Partial<typeof dummyEllipse>;
 
  * */
 
-export const draw_ellipse_full_tf = async ({ellipseParams, resolution}) => {
+export const draw_ellipse_full_tf = async ({ ellipseParams, resolution }) => {
   const mask_t = tf.tidy(() => {
-    const {x_mean: x_c, y_mean: y_c, a, b, sU: U} = ellipseParams;
+    const { x_mean: x_c, y_mean: y_c, a, b, sU: U } = ellipseParams;
     console.log('x_c, y_c, a, b, U, resolution', x_c, y_c, a, b, U, resolution);
     const x_c_t = tf.scalar(x_c);
     const y_c_t = tf.scalar(y_c);
@@ -369,7 +369,7 @@ export const draw_ellipse_full_tf = async ({ellipseParams, resolution}) => {
     return mask_t;
   });
 
-  return {base64: await tensorToImage64(mask_t), ballMask: mask_t};
+  return { base64: await tensorToImage64(mask_t), ballMask: mask_t };
 };
 
 export const loadModel = async ({
@@ -384,9 +384,30 @@ export const loadModel = async ({
     const startTimeModel = Date.now();
     const tfLoader = loadLayer ? tf.loadGraphModel : tf.loadLayersModel;
     const model = await tfLoader(bundleResourceIO(modelJson, modelWeights));
-    console.log(`loading model in ${Date.now() - startTimeModel}`);
+    console.log(`loading model in ${Date.now() - startTimeModel} graphModel : ${loadLayer}`);
     return model;
   } catch (err) {
-    console.log('error loading model', err);
+    console.log('error loading model');
   }
 };
+
+
+/**
+ * Rescales an image with padding using tensorflow functionalities.
+ * */
+
+export const rescaleImageWithPadding = ({ image, resolution }: { image: tf.Tensor3D, resolution: [number, number] }) => {
+
+  const [H, W, C] = image.shape;
+  const dim = Math.max(H, W);
+  const vertical_pad_up = Math.floor((dim - H) / 2);
+  const vertical_pad_down = dim - H - vertical_pad_up
+  const horizontal_pad_left = Math.floor((dim - W) / 2)
+  const horizontal_pad_right = dim - W - horizontal_pad_left
+  const image_t = image; //tf.convert_to_tensor(image)
+  const paddings_t: [number, number][] = [[vertical_pad_up, vertical_pad_down], [horizontal_pad_left, horizontal_pad_right], [0, 0]]
+  const padded_image_t = tf.pad(image_t, paddings_t)
+  const padded_image_t_expanded: tf.Tensor4D = tf.expandDims(padded_image_t, 0)
+  const padded_image_t_resized = tf.image.resizeNearestNeighbor(padded_image_t_expanded, resolution)
+  return padded_image_t_resized;
+}

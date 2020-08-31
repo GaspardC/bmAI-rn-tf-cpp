@@ -39,9 +39,15 @@ let model;
 let modelFinal;
 
 const loadModelFinal = async () => {
-  const modelJson = require('../assets/post_openpose/standing/model.json');
-  const modelWeights = require('../assets/post_openpose/standing/group1-shard1of1.bin');
-  modelFinal = await loadModel({modelJson, modelWeights});
+  try{
+    console.log('loading model final')
+    const modelJson = require('../assets/post_openpose/standing/model.json');
+    const modelWeights = require('../assets/post_openpose/standing/group1-shard1of1.bin');
+    modelFinal = await loadModel({modelJson, modelWeights, loadLayer: false});
+    // console.log('modelFinal', modelFinal)
+  }catch(e){
+    console.log('err loadig model final', e)
+  }
   return modelFinal;
 };
 
@@ -83,11 +89,12 @@ const Home = () => {
   }>({loading: false, error: '', res: ''});
 
   async function loadOpenPoseModel() {
+    console.log('loading open pose model')
     const modelJson = require('../assets/model/frozen/model.json');
     const modelWeights = require('../assets/model/frozen/group1-shard1of1.bin');
-    model = await loadModel({modelJson, modelWeights});
-
+    
     setTfReady(true);
+    model = await loadModel({modelJson, modelWeights, loadLayer: true});
     return model;
   }
 
@@ -121,9 +128,9 @@ const Home = () => {
       setResTf((prev) => ({...prev, error: err ?? 'error model'}));
       console.log('erreur model !');
       console.log(err);
+      cleanTF();
     } finally {
       setResTf((prev) => ({...prev, loading: false}));
-      tf.disposeVariables();
     }
   };
 
@@ -210,9 +217,8 @@ const Home = () => {
   };
 
   useEffect(() => {
-    loadOpenPoseModel().then(() => {
-      loadModelFinal();
-    });
+    console.log('mounting')
+    cleanTF()
   }, []);
 
   useEffect(() => {
@@ -252,11 +258,35 @@ const Home = () => {
 
   useEffect(() => {
     if (!resFullTf.features) return;
-    const res = model.predict(resFullTf.features) as Tensor4D;
-    res.print()
+    (async () => {
+      try{
+        if(!modelFinal) modelFinal = await loadModelFinal()
+        const res = modelFinal.predict(resFullTf.features) as Tensor4D;
+        console.log('final result')
+        res.print()
+        console.log('DONE')
+      }catch(e){
+        console.log('error final model', e)
+      }
+      finally{
+        cleanTF()
+      }
+    })()
+
 
 
   }, [resFullTf]);
+
+  const cleanTF = async () => {
+    console.log('cleaning')
+    model = null; 
+    modelFinal = null;
+    tf.disposeVariables();
+    loadOpenPoseModel().then(() => {
+      loadModelFinal()
+    });
+
+  }
 
   const resetToDefault = ({resetImage = true}: {resetImage?: boolean}) => {
     if (resetImage)
@@ -268,6 +298,7 @@ const Home = () => {
     setResTf({loading: false, error: '', uri: '', tensor4D: null});
     setTennisBallRes({res: {}, loading: false, error: ''});
     setResFullTf({loading: false, res: '', error: ''});
+    cleanTF()
   };
 
   const isrunning = () =>
