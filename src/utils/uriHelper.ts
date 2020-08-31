@@ -1,5 +1,5 @@
 import RNFS from 'react-native-fs';
-import {Asset} from 'expo-asset';
+import { Asset } from 'expo-asset';
 import AssetUtils from 'expo-asset-utils';
 import * as ImageManipulator from 'expo-image-manipulator';
 
@@ -29,6 +29,8 @@ export const loadRemotely = (uri): Promise<InstanceType<typeof Asset>> => {
   return AssetUtils.resolveAsync(uri);
 };
 
+export const getBase64FromUri = uri => AssetUtils.base64forImageUriAsync(uri)
+
 export const getFilePath = async (image) => {
   const asset = Asset.fromModule(image);
   if (!asset.localUri) {
@@ -54,7 +56,7 @@ export async function downloadAssetSource(uri) {
       .then((itExists) => {
         if (itExists) {
           RNFS.unlink(filename)
-            .then(() => {})
+            .then(() => { })
             .catch((err) => {
               console.error(err);
               reject('Unable to unlink file at: ' + filename);
@@ -73,9 +75,9 @@ export async function downloadAssetSource(uri) {
             } else {
               reject(
                 'File at ' +
-                  filename +
-                  ' not downloaded.  Status code: ' +
-                  res.statusCode,
+                filename +
+                ' not downloaded.  Status code: ' +
+                res.statusCode,
               );
             }
           })
@@ -95,7 +97,14 @@ export const rotateImageIfNeeded = async (image) => {
   if (image.width < image.height) return image;
   const manipResult = await ImageManipulator.manipulateAsync(
     image.localUri || image.uri,
-    [{rotate: 90}, {flip: ImageManipulator.FlipType.Vertical}],
+    [{ rotate: 90 }, { flip: ImageManipulator.FlipType.Vertical }],
   );
   return manipResult;
 };
+
+
+export function base64ToDataUri(base64: string): string {
+  return `data:image/jpeg;base64,${base64}`;
+}
+
+export const uriToBase64Uri = base64Uri => base64Uri.replace('data:image/jpeg;base64', '')

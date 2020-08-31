@@ -5,15 +5,15 @@ import React, {
   useEffect,
   forwardRef,
 } from 'react';
-import {Image, Button} from 'react-native-magnus';
-import {DivRow} from '../layout';
+import { Image, Button } from 'react-native-magnus';
+import { DivRow } from '../layout';
 import ImagePicker from 'react-native-image-picker';
 import {
   rotateImageIfNeeded,
   getFilePath,
   loadRemotely,
 } from '../../utils/uriHelper';
-import {resizeImage} from '../../utils/tf_utils';
+import { resizeImage } from '../../utils/tf_utils';
 import { isDev } from '../../utils/index';
 
 const TEST_IMGS = [
@@ -41,12 +41,12 @@ export const getAllTestImg = TEST_IMGS.map((url) => ({
 }));
 export const RESIZE_HEIGHT = 700;
 
-const PhotoPicker = forwardRef(({resetToDefault: resetToDefaultProps}:any, ref) => {
+const PhotoPicker = forwardRef(({ resetToDefault: resetToDefaultProps }: any, ref) => {
   const [imageSource, setImageSource] = useState(imageDefaultRemote);
   const [imageDefault, setImageDefault] = useState(imageDefaultRemote);
 
   const getImageSource = async (imageSourceProps?) => {
-    const imageSource =   imageSourceProps ?? await getImageDefault();
+    const imageSource = imageSourceProps ?? await getImageDefault();
     // console.log('image source', imageSource);
     if (imageSource?.uri != null) return imageSource;
     const sourceFile = await getFilePath(imageDefault);
@@ -110,7 +110,7 @@ const PhotoPicker = forwardRef(({resetToDefault: resetToDefaultProps}:any, ref) 
 
         // You can also display the image using data:
         // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-        const logSource = {...source};
+        const logSource = { ...source };
         delete logSource['base64'];
         console.log('source is ', logSource);
         setImageSource(source);
@@ -124,14 +124,14 @@ const PhotoPicker = forwardRef(({resetToDefault: resetToDefaultProps}:any, ref) 
       <DivRow>
         {imageSource?.uri != null && (
           <Image
-            {...{source: {uri: imageSource.uri}, resizeMode: 'contain'}}
+            {...{ source: { uri: imageSource.uri }, resizeMode: 'contain' }}
             h={200}
             w={200}></Image>
         )}
       </DivRow>
       <DivRow justifyContent="space-around">
         <Button
-          {...{onPress: openPicker, underlayColor: 'blue100'}}
+          {...{ onPress: openPicker, underlayColor: 'blue100' }}
           bg="white"
           borderWidth={1}
           borderColor="blue500"
@@ -140,7 +140,7 @@ const PhotoPicker = forwardRef(({resetToDefault: resetToDefaultProps}:any, ref) 
           Chose another one
         </Button>
         <Button
-          {...{onPress: resetToDefault, underlayColor: 'red100'}}
+          {...{ onPress: resetToDefault, underlayColor: 'red100' }}
           bg="white"
           borderWidth={1}
           borderColor="red500"

@@ -1,9 +1,11 @@
 import * as tf from '@tensorflow/tfjs';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as jpeg from 'jpeg-js';
-import { image, scalar } from '@tensorflow/tfjs';
-import { bundleResourceIO } from '@tensorflow/tfjs-react-native';
+import { image, scalar, tensor } from '@tensorflow/tfjs';
+import { bundleResourceIO, decodeJpeg, fetch } from '@tensorflow/tfjs-react-native';
 
+import { Image } from 'react-native'
+import { base64ToDataUri } from './uriHelper';
 // Height and width of the input features of the second model
 const FEATURES_SIZE: [number, number] = [92, 92];
 const LIMBS_DROP_INDEXES = [9, 13];
@@ -12,9 +14,7 @@ const N_JOINTS = 19;
 const N_RELEVANT_LIMBS = 17;
 const N_RELEVANT_JOINTS = 18;
 
-export function toDataUri(base64: string): string {
-  return `data:image/jpeg;base64,${base64}`;
-}
+
 
 export async function resizeImage(
   imageUrl: string,
@@ -42,12 +42,25 @@ export async function resizeImage(
   return res;
 }
 
+export const imageUriToTensor = async (imageUri) => {
+  // Load an image as a Uint8Array
+  const imageUri2 = 'http://image-uri-here.example.com/image.jpg';
+  const response = await fetch(imageUri2, {}, { isBinary: true });
+  const imageDataArrayBuffer = await response.arrayBuffer();
+  const imageData = new Uint8Array(imageDataArrayBuffer);
+
+  // Decode image data to a tensor
+  const imageTensor = decodeJpeg(imageData);
+  return imageTensor;
+}
+
 export async function base64ImageToTensor(
   base64: string,
   normalize?: boolean,
 ): Promise<tf.Tensor4D> {
   const rawImageData = tf.util.encodeString(base64, 'base64');
   const TO_UINT8ARRAY = true;
+  console.log('encode string')
   const { width, height, data } = jpeg.decode(rawImageData); //TO_UINT8ARRAY
   // Drop the alpha channel info
   const buffer = new Float32Array(width * height * 3);
@@ -192,16 +205,25 @@ export async function build_features_full_tf(
   return features_t;
 }
 
-export const tensorToImage64 = async (channel_t: tf.Tensor) => {
+export const tensorToUri = async (tensor: tf.Tensor) => {
+  return base64ToDataUri(await toBase64(tensor));
+}
+
+export const tensorToImage64 = async (inputTensor: tf.Tensor) => {
+
+  const channel_t = inputTensor.rank > 3 ? tf.squeeze(inputTensor) : inputTensor
   const [H, W] = channel_t.shape;
 
   const res = tf.tidy(() => {
     // # Get rid of extra dimensions
 
     // # Rescale in range 0 - 255
-    const min_value_t = tf.min(channel_t);
-    const max_value_t = tf.max(channel_t);
-    console.log(`channel_t_.shape ${channel_t.shape}`);
+    const min_value_t = tf.min(inputTensor);
+    const max_value_t = tf.max(inputTensor);
+
+
+    console.log(`channel_t_squeeze.shape ${channel_t.shape}`);
+
 
     const channel_t_squeeze_ = tf.mul(
       tf.div(tf.sub(channel_t, min_value_t), tf.sub(max_value_t, min_value_t)),
@@ -211,17 +233,21 @@ export const tensorToImage64 = async (channel_t: tf.Tensor) => {
 
     // # Cast to int
     const channel_t_squeeze_int = tf.cast(channel_t_squeeze_, 'int32');
+    console.log(`channel_t_squeeze_int.shape ${channel_t_squeeze_int.shape}`);
 
     // # Repeat the tensor along channel dimension
-    const channel_t_ = tf.stack(
+    const channel_t_ = channel_t_squeeze_int.shape.length === 2 ? tf.stack(
       [channel_t_squeeze_int, channel_t_squeeze_int, channel_t_squeeze_int],
       2,
-    );
+    ) : channel_t_squeeze_int;
 
     // # Add alpha channel
     const alpha_channel_t = tf.mul(tf.ones([H, W]), 255);
 
     // # Stack alpha channel
+    console.log(`channel_t_.shape ${channel_t_.shape}`);
+    console.log(`alpha_channel_t.shape ${alpha_channel_t.shape}`);
+
     const res = tf.concat([channel_t_, tf.expandDims(alpha_channel_t, 2)], 2);
     console.log(res.shape);
     return res;
@@ -229,6 +255,8 @@ export const tensorToImage64 = async (channel_t: tf.Tensor) => {
 
   return await toBase64(res, W, H);
 };
+
+
 export async function tensorToImageUrl_thomas(output_maps_t: tf.Tensor4D) {
   // # Get tensor from numpy array
   // const output_maps_t = tf.compat.v1.convert_to_tensor(output_maps)
@@ -240,7 +268,13 @@ export async function tensorToImageUrl_thomas(output_maps_t: tf.Tensor4D) {
   return await tensorToImage64(channel_t_squeeze);
 }
 
-const toBase64 = async (tensor, W, H) => {
+const toBase64 = async (inputTensor, inputW = null, inputH = null) => {
+
+  const tensor = inputTensor.rank > 3 ? tf.squeeze(inputTensor) : inputTensor;
+  const [nW, nH] = tensor.shape;
+  const W = inputW ?? nW;
+  const H = inputH ?? nH;
+
   const res_flatten = tf.reshape(tensor, [-1]);
   const data = await res_flatten.data();
 
@@ -250,7 +284,7 @@ const toBase64 = async (tensor, W, H) => {
     height: H,
   };
 
-  const jpegImageData = jpeg.encode(rawImageData, 75);
+  const jpegImageData = jpeg.encode(rawImageData, 100);
   const base64Encoding = tf.util.decodeString(jpegImageData.data, 'base64');
   return base64Encoding;
 };
@@ -396,17 +430,20 @@ export const loadModel = async ({
  * Rescales an image with padding using tensorflow functionalities.
  * */
 
-export const rescaleImageWithPadding = ({ image, resolution }: { image: tf.Tensor3D, resolution: [number, number] }) => {
+export const rescaleImageWithPadding = ({ image, resolution }: { image: tf.Tensor, resolution: [number, number] }) => {
 
-  const [H, W, C] = image.shape;
+  const inputImage = image.rank === 4 ? tf.squeeze(image) : image
+  const [H, W, C] = inputImage.shape;
+  console.log('image shape', image.shape);
   const dim = Math.max(H, W);
   const vertical_pad_up = Math.floor((dim - H) / 2);
   const vertical_pad_down = dim - H - vertical_pad_up
   const horizontal_pad_left = Math.floor((dim - W) / 2)
   const horizontal_pad_right = dim - W - horizontal_pad_left
-  const image_t = image; //tf.convert_to_tensor(image)
+  const image_t = inputImage; //tf.convert_to_tensor(image)
   const paddings_t: [number, number][] = [[vertical_pad_up, vertical_pad_down], [horizontal_pad_left, horizontal_pad_right], [0, 0]]
   const padded_image_t = tf.pad(image_t, paddings_t)
+
   const padded_image_t_expanded: tf.Tensor4D = tf.expandDims(padded_image_t, 0)
   const padded_image_t_resized = tf.image.resizeNearestNeighbor(padded_image_t_expanded, resolution)
   return padded_image_t_resized;

@@ -26,4 +26,4 @@ export function isJSON(str) {
     return true;
 }
 
-export const logError = e => isJSON(e) ? JSON.stringify(e) : e;
+export const logError = e => isJSON(e) ? e : JSON.stringify(e);
