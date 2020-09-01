@@ -21,7 +21,7 @@ import {
   tensorToUri,
 } from '../utils/tf_utils';
 import { getAllTestImg } from '../components/photoPicker/index';
-import { isDev } from '../utils';
+import { isDev, timeoutifyPromise } from '../utils';
 import { Tensor4D } from '@tensorflow/tfjs';
 import { logError } from '../utils/index';
 import { base64ToDataUri, getBase64FromUri, uriToBase64Uri } from '../utils/uriHelper';
@@ -79,22 +79,9 @@ const CnnPage = () => {
   };
 
   const processTFImg = async (uri: string) => {
-    setTimeout(async () => {
+    timeoutifyPromise(async () => {
       try {
-
-        // const { uri: resizedUri, base64 } = await resizeImage(
-        //   uri,
-        //   SIZE_INPUT_MODEL,
-        //   SIZE_INPUT_MODEL,
-        // );
-
-        // const inputMatTest = await base64ImageToTensor(base64, true);
-        // const tensorImage = base64ToDataUri(await tensorToImage64(inputMatTest));
-
         console.log('will process')
-
-        // const base64 = await getBase64FromUri(uri)
-
         let base64;
         if (uri.startsWith('data:image/jpeg;base64')) {
           base64 = uriToBase64Uri(uri)
@@ -113,13 +100,6 @@ const CnnPage = () => {
 
         const tensorImage = base64ToDataUri(await tensorToImage64(inputMat));
 
-
-        // console.log('rescaleImageWithPadding', inputMat)
-
-        // const imageUrl = await tensorToUri(tensorImage);
-        // const imageUrl = await tensorToUri(inputMatTest);
-
-        // console.log('tensorToImageUrl', imageUrl)
 
         photoPickerRef.current.setImageSource({ uri: tensorImage, height: SIZE_INPUT_MODEL, width: SIZE_INPUT_MODEL });
 
@@ -154,7 +134,7 @@ const CnnPage = () => {
         //    tf.disposeVariables();
         // }
       }
-    }, 1)
+    }, 30)
 
   };
 

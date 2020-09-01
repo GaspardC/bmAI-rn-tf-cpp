@@ -27,3 +27,10 @@ export function isJSON(str) {
 }
 
 export const logError = e => isJSON(e) ? e : JSON.stringify(e);
+
+
+export const timeoutifyPromise = (promiseFunc: () => Promise<any>, timeout = 1) => new Promise((resolve, reject) => {
+    setTimeout(() => {
+        promiseFunc().then((res) => resolve(res)).catch((err) => reject(err))
+    }, timeout)
+})
