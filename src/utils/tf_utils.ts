@@ -421,7 +421,7 @@ export const loadModel = async ({
     console.log(`loading model in ${Date.now() - startTimeModel} graphModel : ${loadLayer}`);
     return model;
   } catch (err) {
-    console.log('error loading model');
+    console.log('error loading model', err);
   }
 };
 

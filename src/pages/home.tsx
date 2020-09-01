@@ -1,13 +1,7 @@
-// 1. detect tennis ball
-// 2. ellipse
-// 3. skeletton
-// 4. full tf
-// chose photo: chose another photo or reset
-
-import React, {useState, useEffect, useRef} from 'react';
-import {Div, Image, Text, Button} from 'react-native-magnus';
-import {logError} from '../utils';
-import {isEmpty} from 'lodash';
+import React, { useState, useEffect, useRef } from 'react';
+import { Div, Image, Text, Button } from 'react-native-magnus';
+import { logError, timeoutifyPromise } from '../utils';
+import { isEmpty } from 'lodash';
 import {
   SafeAreaView,
   StyleSheet,
@@ -29,83 +23,83 @@ import {
   build_features_full_tf,
   loadModel,
 } from '../utils/tf_utils';
-import {Tensor4D} from '@tensorflow/tfjs';
-import {DivRow} from '../components/layout';
+import { Tensor4D } from '@tensorflow/tfjs';
+import { DivRow } from '../components/layout';
 import PhotoPicker from '../components/photoPicker';
-import {RESIZE_HEIGHT} from '../components/photoPicker/index';
+import { RESIZE_HEIGHT } from '../components/photoPicker/index';
 import TextInstruction from '../components/text/instruction';
 
 let model;
 let modelFinal;
 
 const loadModelFinal = async () => {
-  try{
+  try {
     console.log('loading model final')
-    const modelJson = require('../assets/post_openpose/standing/model.json');
-    const modelWeights = require('../assets/post_openpose/standing/group1-shard1of1.bin');
-    modelFinal = await loadModel({modelJson, modelWeights, loadLayer: false});
+    const modelJson = require('../assets/models/openpose/post_openpose/standing/model.json');
+    const modelWeights = require('../assets/models/openpose/post_openpose/standing/group1-shard1of1.bin');
+    modelFinal = await loadModel({ modelJson, modelWeights, loadLayer: false });
     // console.log('modelFinal', modelFinal)
-  }catch(e){
+  } catch (e) {
     console.log('err loadig model final', e)
   }
   return modelFinal;
 };
 
-const {HelloWorld: CppDetectTennisBall} = NativeModules;
+const { HelloWorld: CppDetectTennisBall } = NativeModules;
 
 const Home = () => {
-  const photoPickerRef = useRef({}) as {current: any};
+  const photoPickerRef = useRef({}) as { current: any };
 
   const [tennisBallRes, setTennisBallRes] = useState<{
     res?: EllipseType;
     loading?: boolean;
     error?: string;
-  }>({res: {}, loading: false, error: ''});
+  }>({ res: {}, loading: false, error: '' });
   const [isTfReady, setTfReady] = useState(false);
   const [resTf, setResTf] = useState<{
     loading?: boolean;
     error?: string;
     uri?: string;
     tensor4D?: tf.Tensor4D;
-  }>({loading: false, error: '', uri: '', tensor4D: null});
+  }>({ loading: false, error: '', uri: '', tensor4D: null });
   const [ellipseTf, setEllipseTf] = useState<{
     loading?: boolean;
     error?: string;
     uri?: string;
     ballMask?: tf.Tensor2D;
-  }>({loading: false, error: '', uri: '', ballMask: null});
+  }>({ loading: false, error: '', uri: '', ballMask: null });
 
   const [resFullTf, setResFullTf] = useState<{
     loading?: boolean;
     error?: string;
     res?: string;
     features?: any;
-  }>({loading: false, error: '', res: '', features: null});
+  }>({ loading: false, error: '', res: '', features: null });
 
   const [resFinal, setResFinal] = useState<{
     loading?: boolean;
     error?: string;
     res?: string;
-  }>({loading: false, error: '', res: ''});
+  }>({ loading: false, error: '', res: '' });
 
   async function loadOpenPoseModel() {
     console.log('loading open pose model')
-    const modelJson = require('../assets/model/frozen/model.json');
-    const modelWeights = require('../assets/model/frozen/group1-shard1of1.bin');
-    
+    const modelJson = require('../assets/models/openpose/frozen/model.json');
+    const modelWeights = require('../assets/models/openpose/frozen/group1-shard1of1.bin');
+
     setTfReady(true);
-    model = await loadModel({modelJson, modelWeights, loadLayer: true});
+    model = await loadModel({ modelJson, modelWeights, loadLayer: true });
     return model;
   }
 
   const processTFImg = async (uri: string) => {
     try {
-      setResTf({loading: true});
+      setResTf({ loading: true });
       if (!isTfReady || !model) {
         await loadOpenPoseModel();
       }
 
-      const {uri: resizedUri, base64} = await resizeImage(uri, RESIZE_HEIGHT);
+      const { uri: resizedUri, base64 } = await resizeImage(uri, RESIZE_HEIGHT);
 
       const inputMat = await base64ImageToTensor(base64);
       const startTime = Date.now();
@@ -125,27 +119,21 @@ const Home = () => {
       }));
       // console.log(`imageUrl ${imageUrl}`);
     } catch (err) {
-      setResTf((prev) => ({...prev, error: err ?? 'error model'}));
+      setResTf((prev) => ({ ...prev, error: err ?? 'error model' }));
       console.log('erreur model !');
       console.log(err);
       cleanTF();
     } finally {
-      setResTf((prev) => ({...prev, loading: false}));
+      setResTf((prev) => ({ ...prev, loading: false }));
     }
   };
 
   const processCppImg = (uriBoth) => {
-    setTennisBallRes({loading: true});
-    return new Promise((resolve, reject) => {
+    setTennisBallRes({ loading: true });
+    return timeoutifyPromise(() => new Promise((resolve, reject) => {
       CppDetectTennisBall.sayHello(uriBoth)
         .then(async (res) => {
           const resJSON = JSON.parse(res);
-          // if (isIos()) {
-          //     // resObj.resUri = resObj?.resUri?.replace('file://', '')
-          //     // resObj.resSource = uriBoth;
-          //     const resUri = await getFileUri(resObj.resUri);
-          //     resObj.resUri = resUri
-          // }
           const resObj: EllipseType = {};
           Object.entries(resJSON).forEach(([key, value]: [string, string]) => {
             if (key === 'sU') return;
@@ -158,15 +146,15 @@ const Home = () => {
             //@ts-ignore
             alert('no ellipse found');
           }
-          setTennisBallRes((prev) => ({...prev, loading: false, res: resObj}));
+          setTennisBallRes((prev) => ({ ...prev, loading: false, res: resObj }));
           resolve(resObj);
         })
         .catch((e) => {
           console.log(e);
-          setTennisBallRes((prev) => ({...prev, loading: false, error: e}));
+          setTennisBallRes((prev) => ({ ...prev, loading: false, error: e }));
           reject(e);
         });
-    });
+    }), 30);
   };
 
   const getEllipse = async () => {
@@ -177,8 +165,8 @@ const Home = () => {
         return;
       }
       const ellipseParams = tennisBallRes.res;
-      setEllipseTf((prev) => ({...prev, loading: true}));
-      const {base64: ellipseBase64, ballMask} = await draw_ellipse_full_tf({
+      setEllipseTf((prev) => ({ ...prev, loading: true }));
+      const { base64: ellipseBase64, ballMask } = await draw_ellipse_full_tf({
         ellipseParams,
         resolution: [
           photoPickerRef.current.imageSource.height,
@@ -191,34 +179,34 @@ const Home = () => {
         ballMask,
       }));
     } catch (e) {
-      setEllipseTf((prev) => ({...prev, error: e}));
+      setEllipseTf((prev) => ({ ...prev, error: e }));
     } finally {
-      setEllipseTf((prev) => ({...prev, loading: false}));
+      setEllipseTf((prev) => ({ ...prev, loading: false }));
     }
   };
 
   const run = async () => {
-    if (isrunning()) {
+    if (isRunning()) {
       //@ts-ignore
       return alert('algorithm running wait before re-running it');
     }
-    resetToDefault({resetImage: false});
+    resetToDefault({ resetImage: false });
     if (!isTfReady) {
-      await loadOpenPoseModel();
+      timeoutifyPromise(await loadOpenPoseModel, 30);
     }
     console.log('pickerref', photoPickerRef.current);
     const image = await photoPickerRef.current.getImageSource(
       photoPickerRef.current.imageSource,
     );
-    const img2log = {...image};
+    const img2log = { ...image };
     delete img2log['base64'];
     console.log('run on image', img2log);
-    await processCppImg(image.uri);
+    timeoutifyPromise(async () => await processCppImg(image.uri));
   };
 
   useEffect(() => {
     console.log('mounting')
-    cleanTF()
+    cleanTF(false)
   }, []);
 
   useEffect(() => {
@@ -230,14 +218,14 @@ const Home = () => {
     if (isEmpty(tennisBallRes.res)) return;
     photoPickerRef.current
       .getImageSource(photoPickerRef.current.imageSource)
-      .then(({uri}) => {
+      .then(({ uri }) => {
         processTFImg(uri);
       });
   }, [tennisBallRes.res]);
 
   useEffect(() => {
     if (!resTf.tensor4D || !ellipseTf.ballMask) return;
-    setResFullTf({loading: true});
+    setResFullTf({ loading: true });
     build_features_full_tf(resTf.tensor4D, ellipseTf.ballMask)
       .then((features) => {
         setResFullTf({
@@ -259,16 +247,16 @@ const Home = () => {
   useEffect(() => {
     if (!resFullTf.features) return;
     (async () => {
-      try{
-        if(!modelFinal) modelFinal = await loadModelFinal()
+      try {
+        if (!modelFinal) modelFinal = await loadModelFinal()
         const res = modelFinal.predict(resFullTf.features) as Tensor4D;
         console.log('final result')
         res.print()
         console.log('DONE')
-      }catch(e){
+      } catch (e) {
         console.log('error final model', e)
       }
-      finally{
+      finally {
         cleanTF()
       }
     })()
@@ -277,32 +265,32 @@ const Home = () => {
 
   }, [resFullTf]);
 
-  const cleanTF = async () => {
+  const cleanTF = async (reloadModel = true) => {
     console.log('cleaning')
-    model = null; 
+    model = null;
     modelFinal = null;
     tf.disposeVariables();
-    loadOpenPoseModel().then(() => {
+    if (reloadModel) loadOpenPoseModel().then(() => {
       loadModelFinal()
     });
 
   }
 
-  const resetToDefault = ({resetImage = true}: {resetImage?: boolean}) => {
+  const resetToDefault = ({ resetImage = true }: { resetImage?: boolean }) => {
     if (resetImage)
       photoPickerRef.current
         .getImageSource()
         .then((res) => photoPickerRef.current.setImageSource(res))
         .catch((e) => console.log(e));
-    setEllipseTf({loading: false, error: '', uri: '', ballMask: null});
-    setResTf({loading: false, error: '', uri: '', tensor4D: null});
-    setTennisBallRes({res: {}, loading: false, error: ''});
-    setResFullTf({loading: false, res: '', error: ''});
+    setEllipseTf({ loading: false, error: '', uri: '', ballMask: null });
+    setResTf({ loading: false, error: '', uri: '', tensor4D: null });
+    setTennisBallRes({ res: {}, loading: false, error: '' });
+    setResFullTf({ loading: false, res: '', error: '' });
     cleanTF()
   };
 
-  const isrunning = () =>
-    ellipseTf.loading || resTf.loading || tennisBallRes.loading;
+  const isRunning = () =>
+    ellipseTf.loading || resTf.loading || tennisBallRes.loading || resFullTf.loading;
 
   return (
     <ScrollView style={styles.scrollView}>
@@ -312,15 +300,18 @@ const Home = () => {
             <TextInstruction>1. Chose a photo :</TextInstruction>
             {/* <DrawerButton /> */}
 
-            <PhotoPicker ref={photoPickerRef} {...{resetToDefault}} />
+            <PhotoPicker ref={photoPickerRef} {...{ resetToDefault }} />
             <TextInstruction>2. run the algorithm:</TextInstruction>
 
             <DivRow justifyContent="space-around">
               <Button
-                {...{onPress: run, underlayColor: 'green500'}}
+                {...{ onPress: run, underlayColor: 'green500' }}
                 bg="white"
+                w={100}
                 borderWidth={1}
                 borderColor="green500"
+                loaderColor='green500'
+                loading={isRunning()}
                 color="green500">
                 run
               </Button>
@@ -350,7 +341,7 @@ const Home = () => {
                   )}
                   {!isEmpty(ellipseTf.uri) && (
                     <Image
-                      {...{source: {uri: ellipseTf.uri}, resizeMode: 'contain'}}
+                      {...{ source: { uri: ellipseTf.uri }, resizeMode: 'contain' }}
                       h={200}
                       w={200}
                     />
@@ -369,7 +360,7 @@ const Home = () => {
                   )}
                   {!isEmpty(resTf.uri) && (
                     <Image
-                      {...{source: {uri: resTf.uri}, resizeMode: 'contain'}}
+                      {...{ source: { uri: resTf.uri }, resizeMode: 'contain' }}
                       h={200}
                       w={200}
                     />
@@ -401,5 +392,5 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-  scrollView: {flex: 1},
+  scrollView: { flex: 1 },
 });

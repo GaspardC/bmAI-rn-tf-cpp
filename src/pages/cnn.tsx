@@ -26,6 +26,9 @@ import { Tensor4D } from '@tensorflow/tfjs';
 import { logError } from '../utils/index';
 import { base64ToDataUri, getBase64FromUri, uriToBase64Uri } from '../utils/uriHelper';
 
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
+
 const MODE_CHAIN = isDev() && false;
 
 const SIZE_INPUT_MODEL = 224;
@@ -46,19 +49,23 @@ const CnnPage = () => {
   }>({ res: null, loading: false, error: '' });
 
   useEffect(() => {
-    loadCNNModel();
+    // timeoutifyPromise(loadCNNModel)
+    return () => {
+      model = null
+      tf.disposeVariables();
+    }
   }, []);
 
   const loadCNNModel = async () => {
-    const modelWeights = require('../assets/cnn_model/group1-shard1of1.bin');
-    const modelJson = require('../assets/cnn_model/model.json');
+    const modelWeights = require('../assets/models/cnn/cnn_padded/group1-shard1of1.bin');
+    const modelJson = require('../assets/models/cnn/cnn_padded/model.json');
     model = await loadModel({ modelJson, modelWeights });
   };
 
   const run = async () => {
     setResTf({ loading: true, error: '', res: null });
     if (!model) {
-      await loadCNNModel();
+      timeoutifyPromise(await loadCNNModel);
     }
 
     if (!MODE_CHAIN)

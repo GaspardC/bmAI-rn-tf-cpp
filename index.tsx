@@ -2,27 +2,65 @@
  * @format
  */
 
-import React from 'react';
-import { AppRegistry, Text } from 'react-native';
+import React, { useState } from 'react';
+import 'react-native-gesture-handler';
+import { AppRegistry } from 'react-native';
 import { ThemeProvider } from 'react-native-magnus';
-// import App from './src/App';
-// import Menu, {DrawerButton} from './src/components/drawer';
-
-// import App from './src/App';
 import { initSentry } from './src/utils';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const appName = require('./app.json')?.name;
 import Home from './src/pages/home';
 import CNNPage from './src/pages/cnn';
+import { Button, Text, Icon } from 'react-native-magnus';
+import useCachedResources from './src/hooks/useCachedResources';
 initSentry();
 
+const ROUTES = {
+  HOME: 'OpenPose models',
+  CNN: 'CNN models'
+}
+const Stack = createStackNavigator();
+
+const SwitchButton = ({ navigation, route }) => {
+  // const [isCnnPage, setIsCnnPage] = useState(true);
+  const onPress = () => {
+    console.log(route)
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: route.name === ROUTES.HOME ? ROUTES.CNN : ROUTES.HOME }],
+    });
+    // setIsCnnPage(!isCnnPage)
+  }
+
+  return <Button bg="blue100" h={40} w={40} ml={10} mb={10} rounded="circle" {...{ onPress }}>
+    <Icon fontSize={'xl'} name="swap" color="blue400" />
+  </Button>
+}
+
 export default function Main() {
+  const areFontsLoaded = useCachedResources();
+
   return (
     <ThemeProvider>
-      {/* <Home /> */}
-      <CNNPage />
-      {/* <Menu /> */}
+      <NavigationContainer>
+        {!areFontsLoaded && <Text>Loading</Text>}
+        {areFontsLoaded && <NavigationContent />}
+      </NavigationContainer>
     </ThemeProvider>
   );
+}
+
+const NavigationContent = () => {
+  const optionsFunc = ({ navigation, route }) => ({ headerLeft: () => SwitchButton({ navigation, route }) })
+  return <Stack.Navigator>
+    <Stack.Screen name={ROUTES.CNN} component={CNNPage} options={optionsFunc} />
+    <Stack.Screen name={ROUTES.HOME} component={Home} options={optionsFunc} />
+  </Stack.Navigator>
 }
 AppRegistry.registerComponent(appName, () => Main);
