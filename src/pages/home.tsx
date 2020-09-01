@@ -28,6 +28,8 @@ import { DivRow } from '../components/layout';
 import PhotoPicker from '../components/photoPicker';
 import { RESIZE_HEIGHT } from '../components/photoPicker/index';
 import TextInstruction from '../components/text/instruction';
+import { MEAN_VALUES } from './cnn';
+import { isDev } from '../utils/index';
 
 let model;
 let modelFinal;
@@ -79,8 +81,8 @@ const Home = () => {
   const [resFinal, setResFinal] = useState<{
     loading?: boolean;
     error?: string;
-    res?: string;
-  }>({ loading: false, error: '', res: '' });
+    res?: { height: number, weight: number };
+  }>({ loading: false, error: '', res: null });
 
   async function loadOpenPoseModel() {
     console.log('loading open pose model')
@@ -186,6 +188,8 @@ const Home = () => {
   };
 
   const run = async () => {
+    initState()
+
     if (isRunning()) {
       //@ts-ignore
       return alert('algorithm running wait before re-running it');
@@ -206,6 +210,8 @@ const Home = () => {
 
   useEffect(() => {
     console.log('mounting')
+    initState()
+
     cleanTF(false)
   }, []);
 
@@ -246,20 +252,33 @@ const Home = () => {
 
   useEffect(() => {
     if (!resFullTf.features) return;
-    (async () => {
+    setResFinal({ loading: true })
+    timeoutifyPromise(() => (async () => {
       try {
         if (!modelFinal) modelFinal = await loadModelFinal()
         const res = modelFinal.predict(resFullTf.features) as Tensor4D;
         console.log('final result')
         res.print()
+        const resData = res.dataSync();
+        const height = resData[0] + MEAN_VALUES.cm;
+        const weight = resData[1] + MEAN_VALUES.kg;
+        if (isDev()) console.log(`prediction is ${height} cm and  ${weight} kg `);
+
+        // const imageUrl = await tensorToImageUrl_thomas(res);
+        // console.log(`tfcode ${Date.now() - startTimeTfCode}`);
+        setResFinal((prev) => ({
+          ...prev,
+          res: { height, weight },
+        }));
         console.log('DONE')
       } catch (e) {
         console.log('error final model', e)
       }
       finally {
-        cleanTF()
+        setResFinal(prev => ({ ...prev, loading: false }))
+        timeoutifyPromise(cleanTF, 30)
       }
-    })()
+    })(), 30)
 
 
 
@@ -269,11 +288,20 @@ const Home = () => {
     console.log('cleaning')
     model = null;
     modelFinal = null;
+    if (reloadModel) setTfReady(false)
     tf.disposeVariables();
     if (reloadModel) loadOpenPoseModel().then(() => {
       loadModelFinal()
     });
 
+  }
+
+  const initState = () => {
+    setEllipseTf({ loading: false, error: '', uri: '', ballMask: null });
+    setResTf({ loading: false, error: '', uri: '', tensor4D: null });
+    setTennisBallRes({ res: {}, loading: false, error: '' });
+    setResFullTf({ loading: false, res: '', error: '' });
+    setResFinal({ loading: false, res: null, error: '' });
   }
 
   const resetToDefault = ({ resetImage = true }: { resetImage?: boolean }) => {
@@ -282,10 +310,7 @@ const Home = () => {
         .getImageSource()
         .then((res) => photoPickerRef.current.setImageSource(res))
         .catch((e) => console.log(e));
-    setEllipseTf({ loading: false, error: '', uri: '', ballMask: null });
-    setResTf({ loading: false, error: '', uri: '', tensor4D: null });
-    setTennisBallRes({ res: {}, loading: false, error: '' });
-    setResFullTf({ loading: false, res: '', error: '' });
+    initState()
     cleanTF()
   };
 
@@ -383,6 +408,19 @@ const Home = () => {
               )}
             </DivRow>
             <TextInstruction>7. Final model prediction</TextInstruction>
+            <DivRow>
+              {resFinal.loading && <ActivityIndicator />}
+              {!resFinal.loading && (
+                <>
+                  {!isEmpty(resFinal.error) && (
+                    <Text>{logError(resFinal.error)}</Text>
+                  )}
+                  {!isEmpty(resFinal.res) && (
+                    <Text>{`The child has an estimated weight of ${resFinal.res.weight.toFixed(2)} kg and an height of ${resFinal.res.height.toFixed(2)} cm`}</Text>
+                  )}
+                </>
+              )}
+            </DivRow>
           </Div>
         </Div>
       </SafeAreaView>

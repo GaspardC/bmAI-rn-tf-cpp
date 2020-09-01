@@ -32,7 +32,7 @@ import '@tensorflow/tfjs-react-native';
 const MODE_CHAIN = isDev() && false;
 
 const SIZE_INPUT_MODEL = 224;
-const MEAN_VALUES = {
+export const MEAN_VALUES = {
   kg: 10.37404983,
   cm: 82.32666807,
 };
