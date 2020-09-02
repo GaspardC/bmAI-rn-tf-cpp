@@ -73,8 +73,8 @@ const CnnPage = () => {
 
   const onSelect = async (type) => {
     cleanTF()
-    const standing = type === STANDING_KID;
-    loadCNNModel(standing);
+    // const standing = type === STANDING_KID;
+    // loadCNNModel(standing);
     setModelType(type);
   }
 

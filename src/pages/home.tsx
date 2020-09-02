@@ -137,6 +137,7 @@ const Home = () => {
   };
 
   const processCppImg = (uriBoth) => {
+
     setTennisBallRes({ loading: true });
     return timeoutifyPromise(() => new Promise((resolve, reject) => {
       CppDetectTennisBall.sayHello(uriBoth)
@@ -200,7 +201,7 @@ const Home = () => {
       //@ts-ignore
       return alert('algorithm running wait before re-running it');
     }
-    resetToDefault({ resetImage: false });
+    initState()
     await tf.ready()
     // if (!isTfReady) {
     //   timeoutifyPromise(await loadOpenPoseModel, 30);
@@ -231,7 +232,6 @@ const Home = () => {
 
   useEffect(() => {
     if (isEmpty(tennisBallRes.res)) return;
-    console.log('tennis bal Res effect triggered', tennisBallRes.res)
     photoPickerRef.current
       .getImageSource(photoPickerRef.current.imageSource)
       .then(({ uri }) => {
@@ -267,8 +267,6 @@ const Home = () => {
       try {
         if (!modelFinal) modelFinal = await loadModelFinal()
         const res = modelFinal.predict(resFullTf.features) as Tensor4D;
-        console.log('final result')
-        res.print()
         const resData = res.dataSync();
         const height = resData[0] + MEAN_VALUES.cm;
         const weight = resData[1] + MEAN_VALUES.kg;

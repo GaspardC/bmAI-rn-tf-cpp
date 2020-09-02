@@ -2,6 +2,8 @@ import RNFS from 'react-native-fs';
 import { Asset } from 'expo-asset';
 import AssetUtils from 'expo-asset-utils';
 import * as ImageManipulator from 'expo-image-manipulator';
+import { RESIZE_HEIGHT } from '../components/photoPicker/index';
+import { resizeImage } from './tf_utils';
 
 function getFilename(source_uri) {
   try {
@@ -25,8 +27,9 @@ function getFilename(source_uri) {
   }
 }
 
-export const loadRemotely = (uri): Promise<InstanceType<typeof Asset>> => {
-  return AssetUtils.resolveAsync(uri);
+export const loadRemotely = async (uri): Promise<InstanceType<typeof Asset>> => {
+  const { uri: resizedUri, base64, width, height } = await resizeImage(uri, RESIZE_HEIGHT);
+  return AssetUtils.resolveAsync(resizedUri);
 };
 
 export const getBase64FromUri = uri => AssetUtils.base64forImageUriAsync(uri)

@@ -11,13 +11,13 @@
 		13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB11A68108700A75B9A /* LaunchScreen.xib */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		8183CEE9D1C14D14BFC4A73E /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D759C2A4FDFB4526ACF66994 /* SplashScreen.storyboard */; };
 		AF110588B0B893E78D82F584 /* libPods-rncpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 330B58D78543147D17068AC8 /* libPods-rncpp.a */; };
 		C9AE4BD8248642A400B37753 /* RCTHeloWorld.m in Sources */ = {isa = PBXBuildFile; fileRef = C9AE4BD6248642A400B37753 /* RCTHeloWorld.m */; };
 		C9AE4BDF24864C7900B37753 /* HWHelloWorld+Private.mm in Sources */ = {isa = PBXBuildFile; fileRef = C9AE4BDE24864C7900B37753 /* HWHelloWorld+Private.mm */; };
 		C9AE4BE724864CCA00B37753 /* DJIProxyCaches.mm in Sources */ = {isa = PBXBuildFile; fileRef = C9AE4BE424864CCA00B37753 /* DJIProxyCaches.mm */; };
 		C9AE4BE824864CCA00B37753 /* DJIError.mm in Sources */ = {isa = PBXBuildFile; fileRef = C9AE4BE624864CCA00B37753 /* DJIError.mm */; };
 		C9AE4BEB24864CEA00B37753 /* hello_world_impl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C9AE4BE924864CEA00B37753 /* hello_world_impl.cpp */; };
-		8183CEE9D1C14D14BFC4A73E /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D759C2A4FDFB4526ACF66994 /* SplashScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,10 +57,10 @@
 		C9AE4BEA24864CEA00B37753 /* hello_world_impl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = hello_world_impl.hpp; path = ../../src/cpp/hello_world_impl.hpp; sourceTree = "<group>"; };
 		C9FB96CC24BC82AD0010CAD2 /* rncpp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = rncpp.entitlements; path = rncpp/rncpp.entitlements; sourceTree = "<group>"; };
 		CAC0161197CA2660B5C7FC49 /* Pods-rncpp-rncppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rncpp-rncppTests.release.xcconfig"; path = "Target Support Files/Pods-rncpp-rncppTests/Pods-rncpp-rncppTests.release.xcconfig"; sourceTree = "<group>"; };
+		D759C2A4FDFB4526ACF66994 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = rncpp/SplashScreen.storyboard; sourceTree = "<group>"; };
 		E380BBD8583E098EF0D903CD /* Pods-rncpp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-rncpp.debug.xcconfig"; path = "Target Support Files/Pods-rncpp/Pods-rncpp.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
-		D759C2A4FDFB4526ACF66994 /* SplashScreen.storyboard */ = {isa = PBXFileReference; name = "SplashScreen.storyboard"; path = "rncpp/SplashScreen.storyboard"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = file.storyboard; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -465,7 +465,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -499,7 +499,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				MARKETING_VERSION = 1.1.1;
+				MARKETING_VERSION = 1.2.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

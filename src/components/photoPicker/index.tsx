@@ -29,7 +29,7 @@ const TEST_IMGS = [
 ];
 
 export const imageDefaultRemote = {
-  uri: 'https://i.imgur.com/MlFb9rY.jpg',
+  uri: 'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_child_censored.png?alt=media&token=151411f2-d983-4ab0-9991-58cdc98a9c3c',//'https://i.imgur.com/MlFb9rY.jpg',
   height: 0,
   width: 0,
 };

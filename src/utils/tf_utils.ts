@@ -60,7 +60,6 @@ export async function base64ImageToTensor(
 ): Promise<tf.Tensor4D> {
   const rawImageData = tf.util.encodeString(base64, 'base64');
   const TO_UINT8ARRAY = true;
-  console.log('encode string')
   const { width, height, data } = jpeg.decode(rawImageData); //TO_UINT8ARRAY
   // Drop the alpha channel info
   const buffer = new Float32Array(width * height * 3);
@@ -88,20 +87,17 @@ export async function build_features_full_tf(
   ball_mask: tf.Tensor2D,
   body_mask?,
 ) {
-  console.log('build_features_full_tf ...');
   // # Split the skeleton maps in limbs and joints maps
   let heat_maps_t = tf.slice(
     skeleton_maps,
     [0, 0, 0, 0],
     [-1, -1, -1, N_JOINTS],
   );
-  console.log('heat_maps_t', heat_maps_t);
   let paf_maps_t = tf.slice(
     skeleton_maps,
     [0, 0, 0, N_JOINTS],
     [-1, -1, -1, N_JOINTS * 2],
   );
-  console.log('paf_maps_t', paf_maps_t);
 
   // Resize the ball mask
   let ballMask: tf.Tensor4D = tf.expandDims(tf.expandDims(ball_mask, 0), 3);
@@ -200,7 +196,6 @@ export async function build_features_full_tf(
     body_features_t = tf.cast(tf.reshape(body_mask, [B, H, W, 1]), 'float32');
     features_t = tf.concat([features_t, body_features_t], -1);
   }
-  console.log('features_t done');
   // return { base64: await tensorToImage64(features_t), features_t }
   return features_t;
 }
@@ -222,7 +217,6 @@ export const tensorToImage64 = async (inputTensor: tf.Tensor) => {
     const max_value_t = tf.max(inputTensor);
 
 
-    console.log(`channel_t_squeeze.shape ${channel_t.shape}`);
 
 
     const channel_t_squeeze_ = tf.mul(
@@ -233,7 +227,6 @@ export const tensorToImage64 = async (inputTensor: tf.Tensor) => {
 
     // # Cast to int
     const channel_t_squeeze_int = tf.cast(channel_t_squeeze_, 'int32');
-    console.log(`channel_t_squeeze_int.shape ${channel_t_squeeze_int.shape}`);
 
     // # Repeat the tensor along channel dimension
     const channel_t_ = channel_t_squeeze_int.shape.length === 2 ? tf.stack(
@@ -245,11 +238,7 @@ export const tensorToImage64 = async (inputTensor: tf.Tensor) => {
     const alpha_channel_t = tf.mul(tf.ones([H, W]), 255);
 
     // # Stack alpha channel
-    console.log(`channel_t_.shape ${channel_t_.shape}`);
-    console.log(`alpha_channel_t.shape ${alpha_channel_t.shape}`);
-
     const res = tf.concat([channel_t_, tf.expandDims(alpha_channel_t, 2)], 2);
-    console.log(res.shape);
     return res;
   });
 
@@ -344,7 +333,7 @@ export type EllipseType = Partial<typeof dummyEllipse>;
 export const draw_ellipse_full_tf = async ({ ellipseParams, resolution }) => {
   const mask_t = tf.tidy(() => {
     const { x_mean: x_c, y_mean: y_c, a, b, sU: U } = ellipseParams;
-    console.log('x_c, y_c, a, b, U, resolution', x_c, y_c, a, b, U, resolution);
+    // console.log('x_c, y_c, a, b, U, resolution', x_c, y_c, a, b, U, resolution);
     const x_c_t = tf.scalar(x_c);
     const y_c_t = tf.scalar(y_c);
     const a_t = tf.scalar(a);
@@ -357,7 +346,7 @@ export const draw_ellipse_full_tf = async ({ ellipseParams, resolution }) => {
     // const U_t = tf.tensor(U); //.as2D(2, 2);
     const U_t = tf.tensor(U).as2D(2, 2);
 
-    console.log('U_t', U_t);
+    // console.log('U_t', U_t);
 
     //Compute angle using the fact that all norms are one and projection on e1 and   e2
     const cos_a_t = tf.squeeze(tf.slice(U_t, [0, 0], [1, 1]));
@@ -418,7 +407,7 @@ export const loadModel = async ({
     const startTimeModel = Date.now();
     const tfLoader = loadLayer ? tf.loadGraphModel : tf.loadLayersModel;
     const model = await tfLoader(bundleResourceIO(modelJson, modelWeights));
-    console.log(`loading model in ${Date.now() - startTimeModel} graphModel : ${loadLayer}`);
+    console.log(`loading model in ${Date.now() - startTimeModel}`);
     return model;
   } catch (err) {
     console.log('error loading model', err);
@@ -434,7 +423,6 @@ export const rescaleImageWithPadding = ({ image, resolution }: { image: tf.Tenso
 
   const inputImage = image.rank === 4 ? tf.squeeze(image) : image
   const [H, W, C] = inputImage.shape;
-  console.log('image shape', image.shape);
   const dim = Math.max(H, W);
   const vertical_pad_up = Math.floor((dim - H) / 2);
   const vertical_pad_down = dim - H - vertical_pad_up

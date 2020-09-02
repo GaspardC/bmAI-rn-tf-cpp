@@ -48,6 +48,21 @@ const MySelect = ({ onSelect: onSelectProps }) => {
             mb="2xl"
             message="This is the long message used to set some context"
             roundedTop="xl"
+            footer={<Div row justifyContent='center' ><Button
+                {...{ onPress: () => selectRef.current.close() }}
+                mt="lg"
+                w={300}
+                h={40}
+                ml="md"
+                px="xl"
+                py="lg"
+                bg="green500"
+                rounded="circle"
+                color="white"
+                shadow={2}
+            >
+                choisir
+              </Button></Div>}
             data={DATA_STANDING}
             renderItem={(item, index) => (
                 <Select.Option value={item} py="md" px="xl">
@@ -55,7 +70,7 @@ const MySelect = ({ onSelect: onSelectProps }) => {
                 </Select.Option>
             )}
         ></Select.Container>
-    </Div>
+    </Div >
 
 
 }
