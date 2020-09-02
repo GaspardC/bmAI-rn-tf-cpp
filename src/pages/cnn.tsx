@@ -28,6 +28,7 @@ import { base64ToDataUri, getBase64FromUri, uriToBase64Uri } from '../utils/uriH
 
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
+import MySelect from '../components/select';
 
 const MODE_CHAIN = isDev() && false;
 
@@ -42,30 +43,42 @@ let model;
 const CnnPage = () => {
   const photoPickerRef = useRef({}) as { current: any };
 
+  const cleanTF = () => {
+    model = null
+    tf.disposeVariables();
+    setResTf(resTfInitState)
+    photoPickerRef.current
+      .getImageSource()
+      .then((res) => photoPickerRef.current.setImageSource(res))
+      .catch((e) => console.log(e));
+  }
+
+  const resTfInitState = { res: null, loading: false, error: '' }
   const [resTf, setResTf] = useState<{
     res?: { height: number, weight: number };
     loading?: boolean;
     error?: string;
-  }>({ res: null, loading: false, error: '' });
+  }>(resTfInitState);
 
   useEffect(() => {
     // timeoutifyPromise(loadCNNModel)
     return () => {
       model = null
       tf.disposeVariables();
+      setResTf(resTfInitState);
     }
   }, []);
 
-  const loadCNNModel = async () => {
-    const modelWeights = require('../assets/models/cnn/cnn_padded/group1-shard1of1.bin');
-    const modelJson = require('../assets/models/cnn/cnn_padded/model.json');
+  const loadCNNModel = async (standing = false) => {
+    const modelWeights = standing ? require('../assets/models/cnn/cnn_padded/group1-shard1of1.bin') : require('../assets/models/cnn/cnn_padded_newborn/group1-shard1of1.bin');
+    const modelJson = standing ? require('../assets/models/cnn/cnn_padded/model.json') : require('../assets/models/cnn/cnn_padded_newborn/model.json');
     model = await loadModel({ modelJson, modelWeights });
   };
 
   const run = async () => {
     setResTf({ loading: true, error: '', res: null });
     if (!model) {
-      timeoutifyPromise(await loadCNNModel);
+      await timeoutifyPromise(await loadCNNModel);
     }
 
     if (!MODE_CHAIN)
@@ -150,8 +163,9 @@ const CnnPage = () => {
       <SafeAreaView>
         <Div p={'lg'} >
           <Div>
+            <MySelect />
             <TextInstruction>1. Chose a photo :</TextInstruction>
-            <PhotoPicker ref={photoPickerRef} />
+            <PhotoPicker ref={photoPickerRef} resetToDefault={cleanTF} />
             <TextInstruction>2. Run the model:</TextInstruction>
             <DivRow justifyContent="space-around">
               <Button
@@ -169,7 +183,6 @@ const CnnPage = () => {
             </DivRow>
             <TextInstruction>3. CNN prediction</TextInstruction>
             <DivRow>
-
               {resTf.loading && <ActivityIndicator color="#5ea1ed" size="large" />
               }
               {!resTf.loading && (

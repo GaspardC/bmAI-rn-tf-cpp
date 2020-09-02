@@ -236,7 +236,7 @@ const Home = () => {
       .then((features) => {
         setResFullTf({
           loading: false,
-          res: 'features computed ✅',
+          res: 'features computed ✔',
           features: features,
         });
       })
@@ -244,7 +244,7 @@ const Home = () => {
         console.log(e);
         setResFullTf({
           loading: false,
-          res: 'features NOT computed',
+          res: 'features not computed ✕',
           features: null,
         });
       });
