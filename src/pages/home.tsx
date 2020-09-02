@@ -30,27 +30,19 @@ import { RESIZE_HEIGHT } from '../components/photoPicker/index';
 import TextInstruction from '../components/text/instruction';
 import { MEAN_VALUES } from './cnn';
 import { isDev } from '../utils/index';
+import MySelect, { INIT_CHILD_MODE, STANDING_KID } from '../components/select/index';
 
 let model;
 let modelFinal;
 
-const loadModelFinal = async () => {
-  try {
-    console.log('loading model final')
-    const modelJson = require('../assets/models/openpose/post_openpose/standing/model.json');
-    const modelWeights = require('../assets/models/openpose/post_openpose/standing/group1-shard1of1.bin');
-    modelFinal = await loadModel({ modelJson, modelWeights, loadLayer: false });
-    // console.log('modelFinal', modelFinal)
-  } catch (e) {
-    console.log('err loadig model final', e)
-  }
-  return modelFinal;
-};
+
 
 const { HelloWorld: CppDetectTennisBall } = NativeModules;
 
 const Home = () => {
   const photoPickerRef = useRef({}) as { current: any };
+
+  const [modelType, setModelType] = useState(INIT_CHILD_MODE)
 
   const [tennisBallRes, setTennisBallRes] = useState<{
     res?: EllipseType;
@@ -84,6 +76,20 @@ const Home = () => {
     res?: { height: number, weight: number };
   }>({ loading: false, error: '', res: null });
 
+
+  const loadModelFinal = async (standing = (modelType === STANDING_KID)) => {
+    try {
+      console.log(`loading model final kids ${standing ? 'standing' : 'lying'}`)
+      const modelJson = standing ? require('../assets/models/openpose/post_openpose/standing/model.json') : require('../assets/models/openpose/post_openpose/lying/model.json');
+      const modelWeights = standing ? require('../assets/models/openpose/post_openpose/standing/group1-shard1of1.bin') : require('../assets/models/openpose/post_openpose/lying/group1-shard1of1.bin');
+      modelFinal = await loadModel({ modelJson, modelWeights, loadLayer: false });
+      // console.log('modelFinal', modelFinal)
+    } catch (e) {
+      console.log('err loadig model final', e)
+    }
+    return modelFinal;
+  };
+
   async function loadOpenPoseModel() {
     console.log('loading open pose model')
     const modelJson = require('../assets/models/openpose/frozen/model.json');
@@ -97,7 +103,7 @@ const Home = () => {
   const processTFImg = async (uri: string) => {
     try {
       setResTf({ loading: true });
-      if (!isTfReady || !model) {
+      if (!model) {
         await loadOpenPoseModel();
       }
 
@@ -124,7 +130,7 @@ const Home = () => {
       setResTf((prev) => ({ ...prev, error: err ?? 'error model' }));
       console.log('erreur model !');
       console.log(err);
-      cleanTF();
+      cleanTF({ reloadModel: false });
     } finally {
       setResTf((prev) => ({ ...prev, loading: false }));
     }
@@ -195,10 +201,11 @@ const Home = () => {
       return alert('algorithm running wait before re-running it');
     }
     resetToDefault({ resetImage: false });
-    if (!isTfReady) {
-      timeoutifyPromise(await loadOpenPoseModel, 30);
-    }
-    console.log('pickerref', photoPickerRef.current);
+    await tf.ready()
+    // if (!isTfReady) {
+    //   timeoutifyPromise(await loadOpenPoseModel, 30);
+    // }
+    // console.log('pickerref', photoPickerRef.current);
     const image = await photoPickerRef.current.getImageSource(
       photoPickerRef.current.imageSource,
     );
@@ -211,8 +218,10 @@ const Home = () => {
   useEffect(() => {
     console.log('mounting')
     initState()
-
-    cleanTF(false)
+    cleanTF({ reloadModel: false })
+    return () => {
+      cleanTF({ reloadModel: false })
+    }
   }, []);
 
   useEffect(() => {
@@ -222,6 +231,7 @@ const Home = () => {
 
   useEffect(() => {
     if (isEmpty(tennisBallRes.res)) return;
+    console.log('tennis bal Res effect triggered', tennisBallRes.res)
     photoPickerRef.current
       .getImageSource(photoPickerRef.current.imageSource)
       .then(({ uri }) => {
@@ -276,7 +286,7 @@ const Home = () => {
       }
       finally {
         setResFinal(prev => ({ ...prev, loading: false }))
-        timeoutifyPromise(cleanTF, 30)
+        // initState()
       }
     })(), 30)
 
@@ -284,15 +294,15 @@ const Home = () => {
 
   }, [resFullTf]);
 
-  const cleanTF = async (reloadModel = true) => {
+  const cleanTF = async ({ reloadModel = false, standing = (modelType === STANDING_KID) }) => {
     console.log('cleaning')
     model = null;
     modelFinal = null;
     if (reloadModel) setTfReady(false)
     tf.disposeVariables();
-    if (reloadModel) loadOpenPoseModel().then(() => {
-      loadModelFinal()
-    });
+    // if (reloadModel) loadOpenPoseModel().then(() => {
+    //   loadModelFinal(standing)
+    // });
 
   }
 
@@ -311,17 +321,24 @@ const Home = () => {
         .then((res) => photoPickerRef.current.setImageSource(res))
         .catch((e) => console.log(e));
     initState()
-    cleanTF()
+    cleanTF({ reloadModel: true })
   };
 
   const isRunning = () =>
     ellipseTf.loading || resTf.loading || tennisBallRes.loading || resFullTf.loading;
 
+  const onSelect = async (type) => {
+    const standing = type === STANDING_KID;
+    resetToDefault({ resetImage: false })
+    cleanTF({ reloadModel: false, standing })
+    setModelType(type);
+  }
   return (
     <ScrollView style={styles.scrollView}>
       <SafeAreaView>
         <Div p={'lg'}>
           <Div>
+            <MySelect onSelect={onSelect} />
             <TextInstruction>1. Chose a photo :</TextInstruction>
             {/* <DrawerButton /> */}
 
@@ -402,7 +419,7 @@ const Home = () => {
                     <Text>{logError(resFullTf.error)}</Text>
                   )}
                   {!isEmpty(resFullTf.res) && (
-                    <Text>{logError(resFullTf.res)}</Text>
+                    <Text>{logError(resFullTf.res).replace(/"/g, '')}</Text>
                   )}
                 </>
               )}

@@ -4,6 +4,8 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
+#import <EXSplashScreen/EXSplashScreenService.h>
+#import <UMCore/UMModuleRegistryProvider.h>
 
 #import <UMCore/UMModuleRegistry.h>
 #import <UMReactNativeAdapter/UMNativeModulesProxy.h>
@@ -70,6 +72,8 @@ static void InitializeFlipper(UIApplication *application) {
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
 //  [super application:application didFinishLaunchingWithOptions:launchOptions];
+  EXSplashScreenService *splashScreenService = (EXSplashScreenService *)[UMModuleRegistryProvider getSingletonModuleForClass:[EXSplashScreenService class]];
+  [splashScreenService showSplashScreenFor:rootViewController];
   return YES;
 }
 

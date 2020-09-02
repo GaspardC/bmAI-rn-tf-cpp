@@ -146,7 +146,7 @@ const PhotoPicker = forwardRef(({ resetToDefault: resetToDefaultProps }: any, re
           borderColor="red500"
           w="45%"
           color="red500">
-          Reset to default
+          Reset
         </Button>
       </DivRow>
     </Fragment>

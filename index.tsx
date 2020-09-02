@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import 'react-native-gesture-handler';
-import { AppRegistry } from 'react-native';
+import { AppRegistry, Image } from 'react-native';
 import { ThemeProvider } from 'react-native-magnus';
 import { initSentry } from './src/utils';
 import { NavigationContainer } from '@react-navigation/native';
@@ -49,7 +49,7 @@ export default function Main() {
   return (
     <ThemeProvider>
       <NavigationContainer>
-        {!areFontsLoaded && <Text>Loading</Text>}
+        {!areFontsLoaded && <Image resizeMode='contain' style={{ height: '100%', width: '100%' }} source={require("./src/assets/images/splash.png")}></Image>}
         {areFontsLoaded && <NavigationContent />}
       </NavigationContainer>
     </ThemeProvider>

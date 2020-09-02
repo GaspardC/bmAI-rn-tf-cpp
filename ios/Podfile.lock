@@ -38,6 +38,9 @@ PODS:
   - EXPermissions (8.1.0):
     - UMCore
     - UMPermissionsInterface
+  - EXSplashScreen (0.5.0):
+    - React
+    - UMCore
   - FBLazyVector (0.62.2)
   - FBReactNativeSpec (0.62.2):
     - Folly (= 2018.10.22.00)
@@ -386,6 +389,7 @@ DEPENDENCIES:
   - EXImageLoader (from `../node_modules/expo-image-loader/ios`)
   - EXImageManipulator (from `../node_modules/expo-image-manipulator/ios`)
   - EXPermissions (from `../node_modules/expo-permissions/ios`)
+  - EXSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
   - Flipper (~> 0.37.0)
@@ -496,6 +500,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-image-manipulator/ios"
   EXPermissions:
     :path: "../node_modules/expo-permissions/ios"
+  EXSplashScreen:
+    :path: "../node_modules/expo-splash-screen/ios"
   FBLazyVector:
     :path: "../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
@@ -607,6 +613,7 @@ SPEC CHECKSUMS:
   EXImageLoader: 5ad6896fa1ef2ee814b551873cbf7a7baccc694a
   EXImageManipulator: 97f61d14c292714d66884e83697e794f8cefe0b0
   EXPermissions: 24b97f734ce9172d245a5be38ad9ccfcb6135964
+  EXSplashScreen: 9423d258b71afa5bf128a83dcb57b636d9900a74
   FBLazyVector: 4aab18c93cd9546e4bfed752b4084585eca8b245
   FBReactNativeSpec: 5465d51ccfeecb7faa12f9ae0024f2044ce4044e
   Flipper: 1670db365568191bd123a0c905b834e77ba9e3d3

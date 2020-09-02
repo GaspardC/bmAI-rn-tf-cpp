@@ -28,7 +28,7 @@ import { base64ToDataUri, getBase64FromUri, uriToBase64Uri } from '../utils/uriH
 
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
-import MySelect from '../components/select';
+import MySelect, { INIT_CHILD_MODE, STANDING_KID } from '../components/select';
 
 const MODE_CHAIN = isDev() && false;
 
@@ -43,6 +43,7 @@ let model;
 const CnnPage = () => {
   const photoPickerRef = useRef({}) as { current: any };
 
+
   const cleanTF = () => {
     model = null
     tf.disposeVariables();
@@ -53,6 +54,7 @@ const CnnPage = () => {
       .catch((e) => console.log(e));
   }
 
+  const [modelType, setModelType] = useState(INIT_CHILD_MODE)
   const resTfInitState = { res: null, loading: false, error: '' }
   const [resTf, setResTf] = useState<{
     res?: { height: number, weight: number };
@@ -69,7 +71,14 @@ const CnnPage = () => {
     }
   }, []);
 
-  const loadCNNModel = async (standing = false) => {
+  const onSelect = async (type) => {
+    cleanTF()
+    const standing = type === STANDING_KID;
+    loadCNNModel(standing);
+    setModelType(type);
+  }
+
+  const loadCNNModel = async (standing = (modelType === STANDING_KID)) => {
     const modelWeights = standing ? require('../assets/models/cnn/cnn_padded/group1-shard1of1.bin') : require('../assets/models/cnn/cnn_padded_newborn/group1-shard1of1.bin');
     const modelJson = standing ? require('../assets/models/cnn/cnn_padded/model.json') : require('../assets/models/cnn/cnn_padded_newborn/model.json');
     model = await loadModel({ modelJson, modelWeights });
@@ -158,14 +167,17 @@ const CnnPage = () => {
 
   };
 
+  const resetToDefault = () => {
+    cleanTF()
+  }
   return (
     <ScrollView style={styles.scrollView}>
       <SafeAreaView>
         <Div p={'lg'} >
           <Div>
-            <MySelect />
+            <MySelect onSelect={onSelect} />
             <TextInstruction>1. Chose a photo :</TextInstruction>
-            <PhotoPicker ref={photoPickerRef} resetToDefault={cleanTF} />
+            <PhotoPicker ref={photoPickerRef} resetToDefault={resetToDefault} />
             <TextInstruction>2. Run the model:</TextInstruction>
             <DivRow justifyContent="space-around">
               <Button

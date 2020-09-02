@@ -1,19 +1,22 @@
 
 import React, { useState } from 'react';
 import { Button, Select, Div, Text } from 'react-native-magnus'
-const STANDING_KID = 'Standing';
-const LYING_KID = 'Lying';
 
-const DATA_STANDING = [
+export const STANDING_KID = 'Standing';
+export const LYING_KID = 'Lying';
+
+export const DATA_STANDING = [
     STANDING_KID,
     LYING_KID
 ];
+export const INIT_CHILD_MODE = DATA_STANDING[0]
 
-const MySelect = () => {
-    const [selectValue, setSelectedValue] = useState(DATA_STANDING[0]);
+const MySelect = ({ onSelect: onSelectProps }) => {
+    const [selectValue, setSelectedValue] = useState(INIT_CHILD_MODE);
     const selectRef: React.RefObject<any> = React.createRef()
     const onSelect = (option) => {
         setSelectedValue(`${option} kid`)
+        onSelectProps(option)
     }
 
     return <Div>
@@ -35,7 +38,6 @@ const MySelect = () => {
         >
             {selectValue ?? 'Select'}
         </Button>
-
         <Select.Container
             onSelect={onSelect}
             ref={selectRef}

@@ -1,4 +1,5 @@
 import { Ionicons, FontAwesome5, Entypo, AntDesign, FontAwesome } from '@expo/vector-icons';
+import * as SplashScreen from 'expo-splash-screen';
 
 import * as Font from 'expo-font';
 import * as React from 'react';
@@ -51,6 +52,7 @@ export default function useCachedResources() {
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
       try {
+        // SplashScreen.preventAutoHideAsync();
         // Load fonts
         await loadFontAsync()
       } catch (e) {
@@ -58,6 +60,7 @@ export default function useCachedResources() {
         console.warn(e);
       } finally {
         setLoadingComplete(true);
+        // SplashScreen.hideAsync().catch(e => console.log(e));
       }
     }
 
