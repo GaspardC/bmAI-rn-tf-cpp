@@ -30,7 +30,7 @@ export async function resizeImage(
     },
   ];
   const saveOptions = {
-    compress: 1,
+    compress: 100,
     format: ImageManipulator.SaveFormat.JPEG,
     base64: true,
   };

@@ -91,7 +91,7 @@ const CnnPage = () => {
     }
 
     if (!MODE_CHAIN)
-      return processTFImg(photoPickerRef.current.imageSource.uri);
+      return processTFImg(photoPickerRef.current.imageSource.originalUri ?? photoPickerRef.current.imageSource.uri);
 
     for (let i = 0; i < getAllTestImg.length; i++) {
       try {
@@ -125,12 +125,14 @@ const CnnPage = () => {
 
         const inputMatTest = await base64ImageToTensor(base64)
 
+        // const inputMatTest = tf.zeros([1, SIZE_INPUT_MODEL, SIZE_INPUT_MODEL, 3])
+
         const inputMat = await rescaleImageWithPadding({ image: inputMatTest, resolution: [SIZE_INPUT_MODEL, SIZE_INPUT_MODEL] })
 
         const tensorImage = base64ToDataUri(await tensorToImage64(inputMat));
 
 
-        photoPickerRef.current.setImageSource({ uri: tensorImage, height: SIZE_INPUT_MODEL, width: SIZE_INPUT_MODEL });
+        photoPickerRef.current.setImageSource({ uri: tensorImage, originalUri: uri, height: SIZE_INPUT_MODEL, width: SIZE_INPUT_MODEL });
 
 
         const startTime = Date.now();

@@ -28,12 +28,22 @@ import { DivRow } from '../components/layout';
 import PhotoPicker from '../components/photoPicker';
 import { RESIZE_HEIGHT } from '../components/photoPicker/index';
 import TextInstruction from '../components/text/instruction';
-import { MEAN_VALUES } from './cnn';
 import { isDev } from '../utils/index';
-import MySelect, { INIT_CHILD_MODE, STANDING_KID } from '../components/select/index';
+import MySelect, { INIT_CHILD_MODE, STANDING_KID, LYING_KID } from '../components/select/index';
 
 let model;
 let modelFinal;
+
+const MEAN_VALUES = {
+  [STANDING_KID]: {
+    kg: 87.8125,
+    cm: 12.0987654321
+  },
+  [LYING_KID]: {
+    kg: 7.6612903226,
+    cm: 70.350877193
+  }
+}
 
 
 
@@ -268,8 +278,8 @@ const Home = () => {
         if (!modelFinal) modelFinal = await loadModelFinal()
         const res = modelFinal.predict(resFullTf.features) as Tensor4D;
         const resData = res.dataSync();
-        const height = resData[0] + MEAN_VALUES.cm;
-        const weight = resData[1] + MEAN_VALUES.kg;
+        const height = resData[0] + MEAN_VALUES[modelType].cm;
+        const weight = resData[1] + MEAN_VALUES[modelType].kg;
         if (isDev()) console.log(`prediction is ${height} cm and  ${weight} kg `);
 
         // const imageUrl = await tensorToImageUrl_thomas(res);

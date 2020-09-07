@@ -113,6 +113,7 @@ const PhotoPicker = forwardRef(({ resetToDefault: resetToDefaultProps }: any, re
         const logSource = { ...source };
         delete logSource['base64'];
         console.log('source is ', logSource);
+
         setImageSource(source);
         // run(source)
       }
