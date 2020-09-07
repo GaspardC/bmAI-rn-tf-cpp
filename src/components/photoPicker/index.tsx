@@ -5,7 +5,7 @@ import React, {
   useEffect,
   forwardRef,
 } from 'react';
-import { Image, Button } from 'react-native-magnus';
+import { Image, Button, Div } from 'react-native-magnus';
 import { DivRow } from '../layout';
 import ImagePicker from 'react-native-image-picker';
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../utils/uriHelper';
 import { resizeImage } from '../../utils/tf_utils';
 import { isDev } from '../../utils/index';
-
+import { ActivityIndicator } from 'react-native'
 const TEST_IMGS = [
   'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/ball.jpg?alt=media&token=ede33521-cf9a-4f01-99a0-3d02cd5789ad',
   'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513310.jpg?alt=media&token=bc395c98-82b1-4879-b125-bf6065c28ba2',
@@ -127,8 +127,12 @@ const PhotoPicker = forwardRef(({ resetToDefault: resetToDefaultProps }: any, re
           <Image
             {...{ source: { uri: imageSource.uri }, resizeMode: 'contain' }}
             h={200}
-            w={200}></Image>
+            w={200}
+          />
         )}
+        <Div bg='gray200' w={200} h={200} position='absolute' top={0} zIndex={-1} rounded='lg' justifyContent='center' alignItems='center'>
+          <ActivityIndicator />
+        </Div>
       </DivRow>
       <DivRow justifyContent="space-around">
         <Button

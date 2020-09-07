@@ -36,8 +36,8 @@ let modelFinal;
 
 const MEAN_VALUES = {
   [STANDING_KID]: {
-    kg: 87.8125,
-    cm: 12.0987654321
+    kg: 12.0987654321,
+    cm: 87.8125
   },
   [LYING_KID]: {
     kg: 7.6612903226,
