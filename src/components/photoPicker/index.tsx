@@ -5,7 +5,7 @@ import React, {
   useEffect,
   forwardRef,
 } from 'react';
-import { Image, Button, Div } from 'react-native-magnus';
+import { Button, Div } from 'react-native-magnus';
 import { DivRow } from '../layout';
 import ImagePicker from 'react-native-image-picker';
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../utils/uriHelper';
 import { resizeImage } from '../../utils/tf_utils';
 import { isDev } from '../../utils/index';
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, Image } from 'react-native'
 const TEST_IMGS = [
   'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/ball.jpg?alt=media&token=ede33521-cf9a-4f01-99a0-3d02cd5789ad',
   'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_02010513310.jpg?alt=media&token=bc395c98-82b1-4879-b125-bf6065c28ba2',
@@ -29,7 +29,7 @@ const TEST_IMGS = [
 ];
 
 export const imageDefaultRemote = {
-  uri: 'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_child_censored.png?alt=media&token=151411f2-d983-4ab0-9991-58cdc98a9c3c',//'https://i.imgur.com/MlFb9rY.jpg',
+  uri: 'https://firebasestorage.googleapis.com/v0/b/gasp-26943.appspot.com/o/bmai_child_censored_min.png?alt=media&token=4aecbbca-f2d5-4277-a426-5b4c23a847ae',//'https://i.imgur.com/MlFb9rY.jpg',
   height: 0,
   width: 0,
 };
@@ -55,14 +55,16 @@ const PhotoPicker = forwardRef(({ resetToDefault: resetToDefaultProps }: any, re
 
   const mount = async () => {
     const imageLoaded = await getImageDefault();
+    console.log('image loaded', imageLoaded);
     //@ts-ignore
     setImageDefault(imageLoaded);
 
     getImageSource(imageLoaded)
       .then((res) => {
+        console.log('getting image source')
         setImageSource(res);
       })
-      .catch((e) => console.log(e));
+      .catch((e) => console.log('error image mount', e));
   };
 
   const resetToDefault = resetToDefaultProps ? resetToDefaultProps : mount;
@@ -120,19 +122,20 @@ const PhotoPicker = forwardRef(({ resetToDefault: resetToDefaultProps }: any, re
     });
   };
 
+  console.log('image source uri', imageSource.uri)
+
   return (
     <Fragment>
       <DivRow>
         {imageSource?.uri != null && (
           <Image
-            {...{ source: { uri: imageSource.uri }, resizeMode: 'contain' }}
-            h={200}
-            w={200}
+            source={{ uri: imageSource?.uri, height: 200, width: 200 }}
+            style={{ height: 200, width: 200, resizeMode: 'contain', }}
           />
         )}
-        <Div bg='gray200' w={200} h={200} position='absolute' top={0} zIndex={-1} rounded='lg' justifyContent='center' alignItems='center'>
+        {/* <Div bg='gray200' w={200} h={200} position='absolute' top={0} zIndex={-1} rounded='lg' justifyContent='center' alignItems='center'>
           <ActivityIndicator />
-        </Div>
+        </Div> */}
       </DivRow>
       <DivRow justifyContent="space-around">
         <Button

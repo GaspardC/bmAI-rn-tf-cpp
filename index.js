@@ -3,19 +3,17 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import 'react-native-gesture-handler';
 import { AppRegistry, Image } from 'react-native';
-import { ThemeProvider } from 'react-native-magnus';
 import { initSentry } from './src/utils';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
 
 const appName = require('./app.json')?.name;
 import Home from './src/pages/home';
 import CNNPage from './src/pages/cnn';
-import { Button, Text, Icon } from 'react-native-magnus';
+import { Button, Icon, ThemeProvider } from 'react-native-magnus';
 import useCachedResources from './src/hooks/useCachedResources';
 initSentry();
 
@@ -36,7 +34,6 @@ const SwitchButton = ({ navigation, route }) => {
     });
     // setIsCnnPage(!isCnnPage)
   };
-
   return (
     <Button
       bg="blue100"

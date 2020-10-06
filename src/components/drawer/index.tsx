@@ -1,7 +1,7 @@
-import React, {createRef} from 'react';
-import {Drawer, Button} from 'react-native-magnus';
+import React, { createRef } from 'react';
+import { Drawer, Button } from 'react-native-magnus';
 
-export const drawerRef = useRef();
+export const drawerRef = createRef<any>();
 
 const Menu = () => {
   return <Drawer ref={drawerRef} />;
