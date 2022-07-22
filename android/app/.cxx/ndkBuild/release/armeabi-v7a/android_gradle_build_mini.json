@@ -1,18 +1,18 @@
 {
   "buildFiles": [
-    "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Android.mk",
-    "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Application.mk"
+    "/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Android.mk",
+    "/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Application.mk"
   ],
   "cleanCommands": [
-    "/Users/Gasp/Library/Android/sdk/ndk/21.3.6528147/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib clean"
+    "/Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-19 NDK_OUT\u003d/Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/lib clean"
   ],
-  "buildTargetsCommand": "/Users/Gasp/Library/Android/sdk/ndk/21.3.6528147/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib {LIST_OF_TARGETS_TO_BUILD}",
+  "buildTargetsCommand": "/Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-19 NDK_OUT\u003d/Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/lib {LIST_OF_TARGETS_TO_BUILD}",
   "libraries": {
     "helloworld-release-armeabi-v7a": {
       "artifactName": "helloworld",
-      "buildCommand": "/Users/Gasp/Library/Android/sdk/ndk/21.3.6528147/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/lib /Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a/libhelloworld.so",
+      "buildCommand": "/Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529/ndk-build NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003d/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Android.mk NDK_APPLICATION_MK\u003d/Users/gaspardc/Development/bmAI/android/app/src/main/jni/Application.mk APP_ABI\u003darmeabi-v7a NDK_ALL_ABIS\u003darmeabi-v7a NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-19 NDK_OUT\u003d/Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003d/Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/lib /Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a/libhelloworld.so",
       "abi": "armeabi-v7a",
-      "output": "/Users/Gasp/Development/todel/rncpp/rncpp/android/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a/libhelloworld.so"
+      "output": "/Users/gaspardc/Development/bmAI/android/app/build/intermediates/ndkBuild/release/obj/local/armeabi-v7a/libhelloworld.so"
     }
   }
 }

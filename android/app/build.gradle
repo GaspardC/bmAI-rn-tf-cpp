@@ -124,7 +124,7 @@ def enableHermes = project.ext.react.get("enableHermes", false);
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    ndkVersion "21.3.6528147"
+    ndkVersion "21.4.7075529"
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -141,6 +141,8 @@ android {
              moduleName "helloworld"
              ldLibs "log"
          }
+         multiDexEnabled true
+
     //    externalNativeBuild {
     //        cmake {
     //            cppFlags "-frtti -fexceptions"

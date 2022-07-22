@@ -1,0 +1,22 @@
+/Users/gaspardc/Development/bmAI/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:48:32: warning: comparison of integers of different signs: 'uint32_t' (aka 'unsigned int') and 'int' [-Wsign-compare]
+        for (uint32_t i = 0; i < size; i++)
+                             ~ ^ ~~~~
+/Users/gaspardc/Development/bmAI/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:86:23: warning: unused variable 'test' [-Wunused-variable]
+            const int test = pow(i - radius, 2);
+                      ^
+/Users/gaspardc/Development/bmAI/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:112:31: warning: unused parameter 'component' [-Wunused-parameter]
+    auto get_bounding_box(int component, cv::Mat stats)
+                              ^
+/Users/gaspardc/Development/bmAI/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:252:27: warning: comparison of integers of different signs: 'int' and 'std::__ndk1::vector<float, std::__ndk1::allocator<float> >::size_type' (aka 'unsigned int') [-Wsign-compare]
+        for (int i = 0; i < X.size(); i++)
+                        ~ ^ ~~~~~~~~
+/Users/gaspardc/Development/bmAI/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:282:42: warning: unused parameter 'mask_high' [-Wunused-parameter]
+                                cv::Mat &mask_high)
+                                         ^
+/Users/gaspardc/Development/bmAI/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:303:50: warning: unused parameter 'result_image' [-Wunused-parameter]
+    std::string save_result_image(const cv::Mat &result_image, const std::string &uri, const bool isIos)
+                                                 ^
+/Users/gaspardc/Development/bmAI/android/app/src/main/jni/../../../../../src/cpp/hello_world_impl.cpp:303:99: warning: unused parameter 'isIos' [-Wunused-parameter]
+    std::string save_result_image(const cv::Mat &result_image, const std::string &uri, const bool isIos)
+                                                                                                  ^
+7 warnings generated.

@@ -133,9 +133,9 @@ const PhotoPicker = forwardRef(({ resetToDefault: resetToDefaultProps }: any, re
             style={{ height: 200, width: 200, resizeMode: 'contain', }}
           />
         )}
-        {/* <Div bg='gray200' w={200} h={200} position='absolute' top={0} zIndex={-1} rounded='lg' justifyContent='center' alignItems='center'>
+        <Div bg='gray200' w={200} h={200} position='absolute' top={0} zIndex={-1} rounded='lg' justifyContent='center' alignItems='center'>
           <ActivityIndicator />
-        </Div> */}
+        </Div>
       </DivRow>
       <DivRow justifyContent="space-around">
         <Button

@@ -6,10 +6,20 @@ apply from: file("../node_modules/@react-native-community/cli-platform-android/n
 include ':app'
 
 include ':opencv'
-project(':opencv').projectDir = new File('/Users/Gasp/Library/OpenCV/OpenCV-android-sdk/sdk')
+project(':opencv').projectDir = new File('/Users/gaspardc/Library/OpenCV/OpenCV-android-sdk/sdk')
 
 include ':unimodules-react-native-adapter'
 project(':unimodules-react-native-adapter').projectDir = new File(rootProject.projectDir, '../node_modules/@unimodules/react-native-adapter/android')
 
 apply from: '../node_modules/react-native-unimodules/gradle.groovy'
 includeUnimodulesProjects()
+
+// dependencyResolutionManagement{
+//     repositoriesMode.st (RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+//     repositories {
+//         google()
+//         mavenCentral()
+//         maven {url 'https://jitpack.io'}
+//     }
+
+// }

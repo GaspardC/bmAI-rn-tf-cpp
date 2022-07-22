@@ -1,13 +1,13 @@
 {
-  "ndkFolder": "/Users/Gasp/Library/Android/sdk/ndk/21.3.6528147",
+  "ndkFolder": "/Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529",
   "messages": [
     {
       "level": "INFO",
-      "message": "android.ndkVersion from module build.gradle is 21.3.6528147"
+      "message": "android.ndkVersion from module build.gradle is 21.4.7075529"
     },
     {
       "level": "INFO",
-      "message": "ndk.dir in local.properties is /Users/Gasp/Library/Android/sdk/ndk/21.3.6528147"
+      "message": "ndk.dir in local.properties is /Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529"
     },
     {
       "level": "INFO",
@@ -15,23 +15,43 @@
     },
     {
       "level": "INFO",
-      "message": "sdkFolder is /Users/Gasp/Library/Android/sdk"
+      "message": "sdkFolder is /Users/gaspardc/Library/Android/sdk"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/Gasp/Library/Android/sdk/ndk/21.3.6528147 by ndk.dir"
+      "message": "Considering /Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529 by ndk.dir"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/Gasp/Library/Android/sdk/ndk-bundle in SDK ndk-bundle folder"
+      "message": "Considering /Users/gaspardc/Library/Android/sdk/ndk-bundle in SDK ndk-bundle folder"
     },
     {
       "level": "INFO",
-      "message": "Considering /Users/Gasp/Library/Android/sdk/ndk/21.3.6528147 in SDK ndk folder"
+      "message": "Considering /Users/gaspardc/Library/Android/sdk/ndk/20.1.5948944 in SDK ndk folder"
     },
     {
       "level": "INFO",
-      "message": "Choosing /Users/Gasp/Library/Android/sdk/ndk/21.3.6528147 from ndk.dir which had the requested version 21.3.6528147"
+      "message": "Considering /Users/gaspardc/Library/Android/sdk/ndk/24.0.8215888 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/gaspardc/Library/Android/sdk/ndk/23.1.7779620 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Considering /Users/gaspardc/Library/Android/sdk/ndk/25.0.8775105 in SDK ndk folder"
+    },
+    {
+      "level": "INFO",
+      "message": "Rejected /Users/gaspardc/Library/Android/sdk/ndk-bundle in SDK ndk-bundle folder because that location has no source.properties"
+    },
+    {
+      "level": "INFO",
+      "message": "Choosing /Users/gaspardc/Library/Android/sdk/ndk/21.4.7075529 from ndk.dir which had the requested version 21.4.7075529"
     }
   ]
 }

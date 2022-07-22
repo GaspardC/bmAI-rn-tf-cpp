@@ -19,14 +19,13 @@ PODS:
   - EXFont (8.2.2):
     - UMCore
     - UMFontInterface
-  - EXGL (8.2.0):
+  - EXGL (9.1.1):
     - EXGL_CPP
     - UMCameraInterface
     - UMCore
     - UMFileSystemInterface
-  - EXGL_CPP (8.2.0):
-    - EXGL_CPP/EXGLContext (= 8.2.0)
-  - EXGL_CPP/EXGLContext (8.2.0)
+  - EXGL_CPP (9.1.2):
+    - React-jsi
   - EXImageLoader (1.2.0):
     - React-Core
     - UMCore
@@ -614,8 +613,8 @@ SPEC CHECKSUMS:
   EXConstants: f486f6b4a36b86e47ab258d4d2b7b2699786fdce
   EXFileSystem: afe9b1fd937d30270bf5108ba44e2f4a1d1ad694
   EXFont: e583875d5d37a9e272d1cdba7f383bd576952919
-  EXGL: 41b3775eb9a9d6766abd36f9a0bf132bc05ba6e8
-  EXGL_CPP: ca6a2c8acf11d3d1fdf8fa9f858a760beaf06440
+  EXGL: 18197ce91dceb9acdc9b0a839919111ca004f434
+  EXGL_CPP: 33f454aae7055477285982e9ce84dff19f83d458
   EXImageLoader: 7153fb1307ac643299a9072b71da0d276f4c7789
   EXImageManipulator: 97f61d14c292714d66884e83697e794f8cefe0b0
   EXPermissions: 30cbe5b72bd209b65c00884180ad058a60bb413d

@@ -1,3 +1,0 @@
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cmake/externalNativeBuild/arm64-v8a/CMakeFiles/rebuild_cache.dir
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cmake/externalNativeBuild/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/Gasp/Development/todel/rncpp/rncpp/android/app/.cxx/cmake/externalNativeBuild/arm64-v8a/CMakeFiles/native-lib.dir

@@ -35,7 +35,7 @@ LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/../../../../../node_modules/djinni/s
 LOCAL_SRC_FILES += $(wildcard $(LOCAL_PATH)/../../../../../node_modules/djinni/support-lib/*.cpp)
 
 # # load opencv
-OPENCVROOT:= /Users/Gasp/Library/OpenCV/OpenCV-android-sdk
+OPENCVROOT:= /Users/gaspardc/Library/OpenCV/OpenCV-android-sdk
 OPENCV_CAMERA_MODULES:=off
 OPENCV_INSTALL_MODULES:=on
 OPENCV_LIB_TYPE:=SHARED
